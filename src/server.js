@@ -25,7 +25,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173", //your React dev server
-      "https://capable-mooncake-8f037f.netlify.app/signup", //your React dev server
+      "https://capable-mooncake-8f037f.netlify.app", //your React dev server
       "https://unicse.pages.dev", // your deployed site
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
