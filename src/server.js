@@ -3,6 +3,18 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import sequelize, { connectDB } from "./config/database.js";
+import Category from "./models/Category.js";
+import Product from "./models/Product.js";
+import ProductImage from "./models/ProductImage.js";
+import SellerListing from "./models/SellerListing.js";
+import Order from "./models/Order.js";
+import OrderItem from "./models/OrderItem.js";
+import Shipment from "./models/Shipment.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Import all routes
 import routes from "./routes/index.js";
@@ -48,6 +60,7 @@ sequelize
 
 // Mount routes (handles all /api/auth/... and other endpoints)
 app.use("/api", routes);
+app.use("/uploads", express.static("uploads"));
 
 // Basic test route
 app.get("/", (req, res) => {
