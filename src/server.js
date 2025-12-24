@@ -59,7 +59,7 @@ sequelize
   .catch((err) => console.error("❌ Error syncing models:", err.message));
 
 // Mount routes (handles all /api/auth/... and other endpoints)
-app.use("/api", routes);
+app.use("/api/v1/", routes);
 app.use("/uploads", express.static("uploads"));
 
 // Basic test route
