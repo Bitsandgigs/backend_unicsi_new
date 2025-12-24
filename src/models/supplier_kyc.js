@@ -1,10 +1,10 @@
 
-
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
-export const Product = sequelize.define("products", {
-    product_id: {
+
+export const SupplierKyc = sequelize.define("supplier_kyc", {
+    id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
@@ -15,29 +15,24 @@ export const Product = sequelize.define("products", {
         allowNull: false,
     },
 
-    title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-
-    description: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-    },
-
-    category_id: {
-        type: DataTypes.UUID,
-        allowNull: true,
-    },
-
-    brand: {
+    gst_number: {
         type: DataTypes.STRING,
         allowNull: true,
     },
 
-    status: {
-        type: DataTypes.ENUM("draft", "active", "paused", "archived"),
-        defaultValue: "draft",
+    msme_number: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+
+    gst_verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
+
+    kyc_status: {
+        type: DataTypes.ENUM("pending", "approved", "rejected"),
+        defaultValue: "pending",
     },
 }, {
     timestamps: true,
