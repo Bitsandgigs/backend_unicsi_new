@@ -30,15 +30,23 @@ export const supplier_gst_details = sequelize.define("supplier_gst_details", {
         allowNull: false,
         defaultValue: true
     },
-    gst_image : {
+    gst_image: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    pan_image : {
+    pan_image: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    pan_number : {
+    pan_number: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    andhar_number: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    andhar_image: {
         type: DataTypes.STRING,
         allowNull: false,
     },
