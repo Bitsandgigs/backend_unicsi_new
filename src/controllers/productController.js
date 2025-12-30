@@ -3,8 +3,8 @@ import csv from "csv-parser";
 import fs from "fs";
 import path from "path";
 import AdmZip from "adm-zip";
-import Product from "../models/Product.js";
-import ProductImage from "../models/ProductImage.js";
+import { Product } from "../models/index.js";
+import { ProductImage } from "../models/index.js";
 import Category from "../models/Category.js";
 import { Op } from "sequelize";
 

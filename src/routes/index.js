@@ -8,10 +8,10 @@ import supplierRoutes from "./supplierRoutes.js";
 const router = express.Router();
 
 router.use("/auth", authRoutes);
-router.use("/products", productRoutes);
-router.use("/admin", adminRoutes);
-router.use("/marketplace", marketplaceRoutes);
-router.use("/orders", orderRoutes);
+// router.use("/products", productRoutes);
+// router.use("/admin", adminRoutes);
+// router.use("/marketplace", marketplaceRoutes);
+// router.use("/orders", orderRoutes);
 
 router.use("/suppliers", supplierRoutes);
 

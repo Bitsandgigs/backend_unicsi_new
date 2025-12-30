@@ -11,19 +11,24 @@ export const Supplier = sequelize.define("suppliers", {
 
     name: {
         type: DataTypes.STRING,
-        allowNull: false,
     },
 
     email: {
         type: DataTypes.STRING,
-        allowNull: false,
         unique: true,
     },
 
-    phone: {
+    number: {
         type: DataTypes.STRING,
-        allowNull: false,
         unique: true,
+    },
+
+    otp: {
+        type: DataTypes.STRING,
+    },
+
+    password: {
+        type: DataTypes.STRING,
     },
 
     role: {

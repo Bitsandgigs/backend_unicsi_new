@@ -1,6 +1,6 @@
 import { Op } from "sequelize";
-import Product from "../models/Product.js";
-import ProductImage from "../models/ProductImage.js";
+import {Product, ProductImage} from "../models/index.js";
+// import { ProductImage } from "../models/index.js";
 import Category from "../models/Category.js";
 import SellerListing from "../models/SellerListing.js";
 

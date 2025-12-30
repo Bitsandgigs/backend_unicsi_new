@@ -10,7 +10,7 @@ export const ProductImage = sequelize.define("product_images", {
     primaryKey: true,
   },
 
-  product_id: {
+  variant_id: {
     type: DataTypes.UUID,
     allowNull: false,
   },

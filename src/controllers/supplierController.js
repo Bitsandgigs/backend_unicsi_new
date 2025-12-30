@@ -1,4 +1,4 @@
-import { signup, login, profile, signup_send_otp, add_bank_details, add_gst_details, getAllSupplier } from "../utils/supplierFnc.js";
+import { signup, login, profile, signup_send_otp, add_bank_details, add_gst_details, getAllSupplier, upload_products, upload_product_variants, add_product_images, create_warehouse, update_warehouse, get_warehouse, delete_warehouse, create_inventory, update_inventory, get_inventory, delete_inventory } from "../utils/supplierFnc.js";
 
 class SupplierController {
 
@@ -106,6 +106,105 @@ class SupplierController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    async upload_products(req, res) {
+        try {
+            const result = await upload_products(req.body);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async upload_product_variants(req, res) {
+        try {
+            const result = await upload_product_variants(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async add_product_images(req, res) {
+        try {
+            const result = await add_product_images(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async create_warehouse(req, res) {
+        try {
+            const result = await create_warehouse(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async update_warehouse(req, res) {
+        try {
+            const result = await update_warehouse(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async get_warehouse(req, res) {
+        try {
+            const result = await get_warehouse(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async delete_warehouse(req, res) {
+        try {
+            const result = await delete_warehouse(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async create_inventory(req, res) {
+        try {
+            const result = await create_inventory(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async get_inventory(req, res) {
+        try {
+            const result = await get_inventory(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async update_inventory(req, res) {
+        try {
+            const result = await update_inventory(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async delete_inventory(req, res) {
+        try {
+            const result = await delete_inventory(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }   
 }
 
 export default new SupplierController();

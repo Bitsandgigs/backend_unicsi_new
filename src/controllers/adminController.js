@@ -1,5 +1,5 @@
-import Product from "../models/Product.js";
-import ProductImage from "../models/ProductImage.js";
+import { Product } from "../models/index.js";
+import { ProductImage } from "../models/index.js";
 import User from "../models/User.js";
 
 export const pendingProducts = async (_req, res) => {

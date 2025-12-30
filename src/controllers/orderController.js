@@ -1,8 +1,5 @@
-import Order from "../models/Order.js";
-import OrderItem from "../models/OrderItem.js";
-import Product from "../models/Product.js";
-import Shipment from "../models/Shipment.js";
-import { Sequelize } from "sequelize";
+// import { Order, OrderItem, Product, Shipment } from "../models/index.js";
+
 
 // Seller creates an order (customer checkout)
 export const createOrder = async (req, res) => {

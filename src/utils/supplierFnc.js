@@ -1,6 +1,4 @@
-import { suppliers } from "../models/suppliers.js";
-import { supplier_bank_details } from "../models/supplier_bank_details.js";
-import { supplier_gst_details } from "../models/supplier_gst_details.js";
+import { Supplier, ProductImage, Product, ProductVariant, Warehouse } from "../models/index.js";
 import { Op } from "sequelize";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -18,11 +16,11 @@ export const signup_send_otp = async (req) => {
         // var otp = await otp_fns.getOTP();
         let otp = 123456
         // const data = await sellers.update({ otp }, { where: { number } })
-        const supplier_exist = await suppliers.findOne({ where: { number } })
+        const supplier_exist = await Supplier.findOne({ where: { number } })
         if (supplier_exist) {
             return { status: "success", msg: "Already Registered!" }
         } else {
-            const update_supplier = await suppliers.create({
+            const update_supplier = await Supplier.create({
                 otp: otp,
                 number: number,
             })
@@ -49,7 +47,7 @@ export const signup = async (req) => {
             return { success: false, error: "All fields are required!" };
         }
 
-        const verify_otp = await suppliers.findOne({ where: { number, otp } })
+        const verify_otp = await Supplier.findOne({ where: { number, otp } })
 
 
         if (!verify_otp) {
@@ -58,7 +56,7 @@ export const signup = async (req) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const result = await suppliers.update({ email, password: hashedPassword }, { where: { number } });
+        const result = await Supplier.update({ email, password: hashedPassword }, { where: { number } });
         return { success: true, data: result };
     } catch (error) {
         return { success: false, error: error.message };
@@ -71,11 +69,11 @@ export const signup_verify_otp = async (req, number, login_from) => {
             return { status: "failure", msg: "Invalid OTP!" }
         }
         const error_otp = await otp_fns.getOTP()
-        const supplier_exist = await suppliers.findOne({ where: { number } })
+        const supplier_exist = await Supplier.findOne({ where: { number } })
         if (supplier_exist) {
             if (req.body.OTP == supplier_exist.otp) {
                 const ot = await otp_fns.getOTP()
-                const update_supplier = await suppliers.update(
+                const update_supplier = await Supplier.update(
                     { signup_otp_status: true, verified: true, otp: ot },
                     {
                         where: {
@@ -99,11 +97,11 @@ export const signup_verify_otp = async (req, number, login_from) => {
                         return { status: "success", supplier_id: supplier_exist.supplier_id }
                     }
                 } else {
-                    await suppliers.update({ otp: error_otp }, { where: { number } })
+                    await Supplier.update({ otp: error_otp }, { where: { number } })
                     return { status: "failure", msg: "Something went wrong!" }
                 }
             } else {
-                await suppliers.update({ otp: error_otp }, { where: { number } })
+                await Supplier.update({ otp: error_otp }, { where: { number } })
                 return { status: "failure", msg: "Incorrect OTP!" }
             }
         } else {
@@ -123,7 +121,7 @@ export const login = async (req, res) => {
         const { emailOrNumber, password } = req.body;
         console.log(req.body);
 
-        const supplier = await suppliers.findOne({
+        const supplier = await Supplier.findOne({
             where: {
                 [Op.or]: [
                     { email: emailOrNumber },
@@ -174,7 +172,7 @@ export const login = async (req, res) => {
 };
 export const profile = async (req, parameters) => {
     try {
-        const supplier = await suppliers.findOne({ where: { id: req.user.id } });
+        const supplier = await Supplier.findOne({ where: { id: req.user.id } });
         return { success: true, data: supplier };
     } catch (error) {
         return { success: false, error: error.message };
@@ -182,7 +180,7 @@ export const profile = async (req, parameters) => {
 };
 export const updateProfile = async (req, parameters) => {
     try {
-        const supplier = await suppliers.update(req.body, { where: { id: req.user.id } });
+        const supplier = await Supplier.update(req.body, { where: { id: req.user.id } });
         return { success: true, data: supplier };
     } catch (error) {
         return { success: false, error: error.message };
@@ -191,7 +189,7 @@ export const updateProfile = async (req, parameters) => {
 
 export const updatePassword = async (req, parameters) => {
     try {
-        const supplier = await suppliers.update(req.body, { where: { id: req.user.id } });
+        const supplier = await Supplier.update(req.body, { where: { id: req.user.id } });
         return { success: true, data: supplier };
     } catch (error) {
         return { success: false, error: error.message };
@@ -231,7 +229,7 @@ export const add_gst_details = async (body_data, supplierId) => {
             return { success: false, error: "All fields are required!" };
         }
         const { gst_number, gst_name, pan_number, supplierId } = body_data;
-        
+
         console.log(body_data);
 
         const panImg = body_data.pan_image || "";
@@ -257,11 +255,210 @@ export const add_gst_details = async (body_data, supplierId) => {
 
 export const getAllSupplier = async () => {
     try {
-        const result = await suppliers.findAll();
+        const result = await Supplier.findAll();
         return { success: true, data: result };
     } catch (error) {
         return { success: false, error: error.message };
     }
 }
+
+
+export const upload_products = async (body_data) => {
+    try {
+        if (!body_data.title || !body_data.description || !body_data.brand || !body_data.status) {
+            return { success: false, error: "All fields are required!" };
+        }
+        const { supplier_id, title, description, brand, status } = body_data;
+        const data = await Product.create({ supplier_id, title, description, brand, status });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Product not added!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+
+export const upload_product_variants = async (req) => {
+    try {
+        const product_id = req.params.product_id;
+        if (!product_id || !req.body.variant_name || !req.body.variant_price || !req.body.variant_stock) {
+            return { success: false, error: "All fields are required!" };
+        }
+        req.body.product_id = product_id;
+        const data = await ProductVariant.create(req.body);
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Product Variant not added!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+
+export const add_product_images = async (req) => {
+    try {
+        const { variant_id } = req.params;
+
+        if (!variant_id) {
+            return { success: false, error: "variant_id is required" };
+        }
+
+        if (!req.files || req.files.length === 0) {
+            return { success: false, error: "No images uploaded" };
+        }
+
+        // Build image records
+        const imagesPayload = req.files.map((file, index) => {
+            const publicPath = `uploads/images/${file.filename}`.replace(/\\/g, "/");
+
+            return {
+                variant_id,
+                image_url: `${req.protocol}://${req.get("host")}/${publicPath}`,
+                sort_order: index,
+            };
+        });
+
+        await ProductImage.bulkCreate(imagesPayload);
+
+        return {
+            success: true,
+            data: imagesPayload,
+        };
+    } catch (error) {
+        console.error(error);
+        return { success: false, error: error.message };
+    }
+};
+
+export const create_warehouse = async (req) => {
+    try {
+        const { supplier_id, name, address, city, state, pincode } = req.body;
+        const data = await Warehouse.create({ supplier_id, name, address, city, state, pincode });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Warehouse not added!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+export const update_warehouse = async (req) => {
+    try {
+        const { warehouse_id } = req.params;
+        const { name, address, city, state, pincode } = req.body;
+        // fetch data updated
+        const data = await Warehouse.updateandFetch({ name, address, city, state, pincode }, { where: { warehouse_id } });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Warehouse not updated!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+export const get_warehouse = async (req) => {
+    try {
+        const { warehouse_id } = req.params;
+        const data = await Warehouse.findAll({ where: { warehouse_id } });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Warehouse not found!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+
+export const delete_warehouse = async (req) => {
+    try {
+        const { warehouse_id } = req.params;
+        // soft delete
+        const data = await Warehouse.update({ is_active: false }, { where: { warehouse_id } });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Warehouse not deleted!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+export const create_inventory = async (req) => {
+    try {
+        const { supplier_id, name, address, city, state, pincode } = req.body;
+        const data = await Inventory.create({ supplier_id, name, address, city, state, pincode });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Inventory not added!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+
+export const update_inventory = async (req) => {
+    try {
+        const { inventory_id } = req.params;
+        const { name, address, city, state, pincode } = req.body;
+        const data = await Inventory.update({ name, address, city, state, pincode }, { where: { inventory_id } });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Inventory not updated!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+export const get_inventory = async (req) => {
+    try {
+        const { sku } = req.params;
+        const data = await Inventory.findAll({ where: { sku } });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Inventory not found!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+export const delete_inventory = async (req) => {
+    try {
+        const { inventory_id } = req.params;
+        // soft delete
+        const data = await Inventory.update({ is_active: false }, { where: { inventory_id } });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Inventory not deleted!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+
+
+
+
+
+
 
 

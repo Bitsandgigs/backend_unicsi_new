@@ -3,13 +3,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import sequelize, { connectDB } from "./config/database.js";
-import Category from "./models/Category.js";
-import Product from "./models/Product.js";
-import ProductImage from "./models/ProductImage.js";
-import SellerListing from "./models/SellerListing.js";
-import Order from "./models/Order.js";
-import OrderItem from "./models/OrderItem.js";
-import Shipment from "./models/Shipment.js";
 import path from "path";
 import { fileURLToPath } from "url";
 

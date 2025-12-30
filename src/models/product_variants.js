@@ -21,6 +21,21 @@ export const ProductVariant = sequelize.define("product_variants", {
     unique: true,
   },
 
+  variant_name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+
+  variant_price: {
+    type: DataTypes.DECIMAL,
+    allowNull: false,
+  },
+
+  variant_stock: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+
   attributes: {
     type: DataTypes.JSONB,
     allowNull: false,

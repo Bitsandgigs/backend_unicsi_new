@@ -19,6 +19,7 @@ export const Warehouse = sequelize.define("warehouses", {
   city: DataTypes.STRING,
   state: DataTypes.STRING,
   pincode: DataTypes.STRING,
+  address: DataTypes.STRING,
 
   is_active: {
     type: DataTypes.BOOLEAN,
