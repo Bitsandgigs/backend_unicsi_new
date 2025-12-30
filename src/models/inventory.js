@@ -29,6 +29,11 @@ export const Inventory = sequelize.define("inventory", {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
+
+  is_active: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
 }, {
   timestamps: true,
   underscored: true,

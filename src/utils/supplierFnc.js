@@ -1,4 +1,4 @@
-import { Supplier, ProductImage, Product, ProductVariant, Warehouse } from "../models/index.js";
+import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory } from "../models/index.js";
 import { Op } from "sequelize";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -397,8 +397,8 @@ export const delete_warehouse = async (req) => {
 
 export const create_inventory = async (req) => {
     try {
-        const { supplier_id, name, address, city, state, pincode } = req.body;
-        const data = await Inventory.create({ supplier_id, name, address, city, state, pincode });
+        const { sku, warehouse_id, available_stock, reserved_stock } = req.body;
+        const data = await Inventory.create({ sku, warehouse_id, available_stock, reserved_stock });
         if (data) {
             return { success: true, data: data };
         } else {
@@ -410,11 +410,24 @@ export const create_inventory = async (req) => {
 }
 
 
-export const update_inventory = async (req) => {
+export const update_inventory_stock = async (req) => {
     try {
         const { inventory_id } = req.params;
-        const { name, address, city, state, pincode } = req.body;
-        const data = await Inventory.update({ name, address, city, state, pincode }, { where: { inventory_id } });
+        const { quantity, action } = req.body;
+        const inventory = await Inventory.findOne({ where: { inventory_id } });
+        if (!inventory) {
+            return { success: false, msg: "Inventory not found!" };
+        }
+        if (action === "add") {
+            inventory.available_stock += quantity;
+        } else if (action === "deduct") {
+            //(>=0 check)
+            if (inventory.available_stock < quantity) {
+                return { success: false, msg: "Not enough stock!" };
+            }
+            inventory.available_stock -= quantity;
+        }
+        const data = await Inventory.update({ available_stock: inventory.available_stock }, { where: { inventory_id } });
         if (data) {
             return { success: true, data: data };
         } else {
@@ -448,6 +461,48 @@ export const delete_inventory = async (req) => {
             return { success: true, data: data };
         } else {
             return { success: false, msg: "Inventory not deleted!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+
+export const get_inventory_by_filter = async (req) => {
+    try {
+        const { filter } = req.query;
+        console.log(filter);
+        //in-stock(> 0)
+        //out-of-stock(= 0)
+        //Inactive(is_active = false)
+        //All
+        //search sku
+        //low stock(< 10)
+        const filterData = {
+            is_active: true
+        }
+        if (filter === "in-stock") {
+            filterData.available_stock = { [Op.gt]: 0 };
+        } else if (filter === "out-of-stock") {
+            filterData.available_stock = { [Op.eq]: 0 };
+        } else if (filter === "inactive") {
+            filterData.is_active = false;
+        } else if (filter === "all") {
+            filterData.is_active = true;
+        }
+
+        if (req.query.search) {
+            filterData.sku = { [Op.like]: `%${req.query.search}%` };
+        }
+        if (req.query.low_stock) {
+            filterData.available_stock = { [Op.lt]: 10 };
+        }
+        console.log(filterData);
+        const data = await Inventory.findAll({ where: filterData });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "Inventory not found!" };
         }
     } catch (error) {
         return { success: false, error: error.message };

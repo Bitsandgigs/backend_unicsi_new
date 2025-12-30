@@ -20,7 +20,8 @@ router.get("/stores/warehouses/:warehouse_id", supplierController.get_warehouse)
 router.delete("/stores/warehouses/:warehouse_id", supplierController.delete_warehouse);
 router.post("/stores/inventory", supplierController.create_inventory);
 router.get("/stores/inventory/sku/:sku", supplierController.get_inventory);
-router.put("/stores/inventory/:inventory_id", supplierController.update_inventory);
+router.get("/stores/inventory", supplierController.get_inventory_by_filter); //in-stock, out-of-stock, all,
+router.put("/stores/inventory/:inventory_id/stock", supplierController.update_inventory_stock);
 router.delete("/stores/inventory/:inventory_id", supplierController.delete_inventory);
 
 // router.post("/stores/uploadProducts", supplierController.supplier_products);
