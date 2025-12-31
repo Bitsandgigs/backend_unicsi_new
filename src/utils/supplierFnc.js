@@ -265,11 +265,11 @@ export const getAllSupplier = async () => {
 
 export const upload_products = async (body_data) => {
     try {
-        if (!body_data.title || !body_data.description || !body_data.brand || !body_data.status) {
+        if (!body_data.title || !body_data.description || !body_data.brand || !body_data.approval_status) {
             return { success: false, error: "All fields are required!" };
         }
-        const { supplier_id, title, description, brand, status } = body_data;
-        const data = await Product.create({ supplier_id, title, description, brand, status });
+        const { supplier_id, title, description, brand, approval_status } = body_data;
+        const data = await Product.create({ supplier_id, title, description, brand, approval_status });
         if (data) {
             return { success: true, data: data };
         } else {

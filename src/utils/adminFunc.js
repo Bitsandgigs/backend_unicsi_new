@@ -1,0 +1,145 @@
+import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory, ProductReviewLog } from "../models/index.js";
+
+export const getPendingProducts = async (req, res) => {
+    try {
+        const products = await Product.findAll({
+            where: { approval_status: "submitted" },
+            include: [
+                {
+                    model: ProductVariant,
+                    as: "variants",
+                    include: [
+                        {
+                            model: ProductImage,
+                            as: "images",
+                        },
+                    ],
+                },
+            ],
+        });
+
+        return {
+            success: true,
+            data: products,
+        }
+
+    } catch (error) {
+        console.error("Error fetching pending products:", error);
+        return {
+            success: false,
+            message: error.message,
+        };
+    }
+};
+
+
+
+export const getProductById = async (req) => {
+    const productId = req.params.product_id;
+    try {
+        const product = await Product.findOne({
+            where: {
+                product_id: productId
+            },
+            include: [
+                {
+                    model: ProductVariant,
+                    as: "variants",
+                    include: [
+                        {
+                            model: ProductImage,
+                            as: "images",
+                        },
+                    ],
+                },
+            ],
+        });
+        return { success: true, data: product };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+export const approveProduct = async (req) => {
+    try {
+        const { product_id } = req.params;
+
+        const product = await Product.findByPk(product_id);
+
+        if (!product) {
+            return {
+                success: false,
+                message: "Product not found",
+            };
+        }
+
+        await product.update({
+            approval_status: "approved",
+            lifecycle_status: "active", // optional: publish to marketplace
+        });
+
+        return {
+            success: true,
+            data: product,
+        };
+    } catch (error) {
+        return {
+            success: false,
+            error: error.message,
+        };
+    }
+};
+
+
+export const rejectProduct = async (req) => {
+    try {
+        const { product_id } = req.params;
+
+        const product = await Product.findByPk(product_id);
+        if (!product) {
+            return {
+                success: false,
+                message: "Product not found",
+            };
+        }
+        await product.update({
+            approval_status: "rejected",
+            lifecycle_status: "inactive", // optional: publish to marketplace
+        });
+        return { success: true, data: product };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+
+export const modifiedProducts = async (req) => {
+    try {
+        const { product_id, variant_id } = req.params;
+
+        console.log("variant-data-id",product_id, variant_id);
+
+        const { price, dimensions_cm, weight_kg, } = req.body;
+        const variant = await ProductVariant.findByPk(variant_id);
+        const product = await Product.findByPk(product_id);
+        if (!product || !variant) {
+            return {
+                success: false,
+                message: "Product not found",
+            };
+        }
+        await product.update({
+            approval_status: "modified",
+            lifecycle_status: "inactive", // optional: publish to marketplace           
+
+        });
+        await variant.update({
+            price,
+            dimensions_cm,
+            weight_kg,
+        });
+        return { success: true, data: variant };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}

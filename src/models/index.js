@@ -9,6 +9,7 @@ import { ProductImage } from "./product_images.js";
 import { Warehouse } from "./warehouses.js";
 import { Inventory } from "./inventory.js";
 import { SupplierPricing } from "./supplier_pricing.js";
+import { ProductReviewLog } from "./product_review_logs.js";
 
 export {
     Supplier,
@@ -21,5 +22,6 @@ export {
     ProductImage,
     Warehouse,
     Inventory,
-    SupplierPricing
+    SupplierPricing,
+    ProductReviewLog
 }

@@ -1,20 +1,11 @@
 import express from "express";
-import { auth, requireRole } from "../middlewares/auth.js";
-import {
-  pendingProducts,
-  approveProduct,
-  rejectProduct,
-  setPricing,
-} from "../controllers/adminController.js";
-import { adminOrders } from "../controllers/orderController.js";
-
 const router = express.Router();
+import SuperAdminController from "../controllers/superAdminController.js";
 
-router.get("/products/pending", auth, requireRole("admin"), pendingProducts);
-router.put("/products/:id/approve", auth, requireRole("admin"), approveProduct);
-router.put("/products/:id/reject", auth, requireRole("admin"), rejectProduct);
-router.put("/products/:id/pricing", auth, requireRole("admin"), setPricing);
-
-router.get("/orders", auth, requireRole("admin"), adminOrders);
+router.get("/products/pending", SuperAdminController.getPendingProducts);
+router.get('/products/:product_id', SuperAdminController.getProductById);
+router.post("/products/:product_id/approve", SuperAdminController.approveProduct);
+router.post("/products/:product_id/reject", SuperAdminController.rejectProduct);
+router.put("/products/:product_id/modified/:variant_id", SuperAdminController.modifiedProducts);
 
 export default router;

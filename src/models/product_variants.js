@@ -2,6 +2,7 @@
 
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
+import { Product } from "./product.js";
 
 export const ProductVariant = sequelize.define("product_variants", {
   variant_id: {
@@ -13,6 +14,10 @@ export const ProductVariant = sequelize.define("product_variants", {
   product_id: {
     type: DataTypes.UUID,
     allowNull: false,
+    references: {
+      model: Product,
+      key: "product_id",
+    },
   },
 
   sku: {

@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import sequelize, { connectDB } from "./config/database.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import('../src/config/association.js')
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -1,26 +1,60 @@
+import {  Supplier, SupplierAuth, SupplierKyc, SupplierAddress, Product, ProductVariant, ProductImage, Warehouse, Inventory, SupplierPricing } from "../models/index.js";
 
-import { Supplier, SupplierAuth, SupplierKyc, SupplierAddress, SupplierToken, Product, ProductVariant, ProductImage, Warehouse, Inventory, SupplierPricing } from "../models/index.js";
+/* ===========================
+   ASSOCIATIONS (MUST BE HERE)
+=========================== */
 
+// Supplier core
 Supplier.hasOne(SupplierAuth, { foreignKey: "supplier_id" });
 Supplier.hasOne(SupplierKyc, { foreignKey: "supplier_id" });
 Supplier.hasMany(SupplierAddress, { foreignKey: "supplier_id" });
-Supplier.hasMany(SupplierToken, { foreignKey: "supplier_id" });
+// Supplier.hasMany(SupplierToken, { foreignKey: "supplier_id" });
 
 SupplierAuth.belongsTo(Supplier);
 SupplierKyc.belongsTo(Supplier);
 SupplierAddress.belongsTo(Supplier);
-SupplierToken.belongsTo(Supplier);
+// SupplierToken.belongsTo(Supplier);
 
+// Supplier → Product
 Supplier.hasMany(Product, { foreignKey: "supplier_id" });
 Product.belongsTo(Supplier);
 
-Product.hasMany(ProductVariant, { foreignKey: "product_id" });
-ProductVariant.belongsTo(Product);
+// Product → Variant
+Product.hasMany(ProductVariant, {
+    foreignKey: "product_id",
+    as: "variants",
+});
+ProductVariant.belongsTo(Product, {
+    foreignKey: "product_id",
+});
 
-Product.hasMany(ProductImage, { foreignKey: "product_id" });
+// Variant → Images
+ProductVariant.hasMany(ProductImage, {
+    foreignKey: "variant_id",
+    as: "images",
+});
+ProductImage.belongsTo(ProductVariant, {
+    foreignKey: "variant_id",
+});
 
+// Supplier → Warehouse
 Supplier.hasMany(Warehouse, { foreignKey: "supplier_id" });
+Warehouse.belongsTo(Supplier, { foreignKey: "supplier_id" });
 
-ProductVariant.hasMany(Inventory, { foreignKey: "sku", sourceKey: "sku" });
-ProductVariant.hasOne(SupplierPricing, { foreignKey: "sku", sourceKey: "sku" });
+// Variant → Inventory
+ProductVariant.hasMany(Inventory, {
+    foreignKey: "variant_id",
+    as: "inventory",
+});
+Inventory.belongsTo(ProductVariant, {
+    foreignKey: "variant_id",
+});
 
+// Variant → Pricing
+ProductVariant.hasOne(SupplierPricing, {
+    foreignKey: "variant_id",
+    as: "pricing",
+});
+SupplierPricing.belongsTo(ProductVariant, {
+    foreignKey: "variant_id",
+});
