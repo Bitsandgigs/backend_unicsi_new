@@ -1,4 +1,4 @@
-import {  Supplier, SupplierAuth, SupplierKyc, SupplierAddress, Product, ProductVariant, ProductImage, Warehouse, Inventory, SupplierPricing } from "../models/index.js";
+import {  Supplier, SupplierAuth, SupplierKyc, SupplierAddress, Product, ProductVariant, ProductImage, Warehouse, Inventory, SupplierPricing, Reseller, Order, OrderItem, NdrCase, LedgerEntry } from "../models/index.js";
 
 /* ===========================
    ASSOCIATIONS (MUST BE HERE)
@@ -58,3 +58,16 @@ ProductVariant.hasOne(SupplierPricing, {
 SupplierPricing.belongsTo(ProductVariant, {
     foreignKey: "variant_id",
 });
+
+
+Reseller.hasMany(Order, { foreignKey: "reseller_id" });
+Order.belongsTo(Reseller);
+
+
+Order.hasMany(OrderItem, { foreignKey: "order_id" });
+OrderItem.belongsTo(Order);
+
+OrderItem.hasOne(NdrCase, { foreignKey: "order_item_id" });
+NdrCase.belongsTo(OrderItem);
+
+

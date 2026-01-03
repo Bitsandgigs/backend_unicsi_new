@@ -10,6 +10,12 @@ import { Warehouse } from "./warehouses.js";
 import { Inventory } from "./inventory.js";
 import { SupplierPricing } from "./supplier_pricing.js";
 import { ProductReviewLog } from "./product_review_logs.js";
+import { Reseller } from "./resellers.js";
+import { NdrCase } from "./ndr_cases.js";
+import { LedgerEntry } from "./ledger_entries.js";
+import { Order } from "./Order.js";
+import { OrderItem } from "./order_items.js";
+import { OrderStatusHistory } from "./order_status_history.js";
 
 export {
     Supplier,
@@ -23,5 +29,11 @@ export {
     Warehouse,
     Inventory,
     SupplierPricing,
-    ProductReviewLog
+    ProductReviewLog,
+    Reseller,
+    NdrCase,
+    LedgerEntry,
+    Order,
+    OrderItem,
+    OrderStatusHistory
 }
