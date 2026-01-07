@@ -1,4 +1,4 @@
-import { signup, login, profile, signup_send_otp, add_bank_details, add_gst_details, getAllSupplier, upload_products, upload_product_variants, add_product_images, create_warehouse, update_warehouse, get_warehouse, delete_warehouse, create_inventory, update_inventory_stock, get_inventory, delete_inventory, get_inventory_by_filter } from "../utils/supplierFnc.js";
+import { signup, login, profile, signup_send_otp, add_bank_details, add_gst_details, getAllSupplier, upload_products, upload_product_variants, add_product_images, create_warehouse, update_warehouse, get_warehouse, delete_warehouse, create_inventory, update_inventory_stock, get_inventory, delete_inventory, get_inventory_by_filter, logout, updatePersonalDetails } from "../utils/supplierFnc.js";
 
 class SupplierController {
 
@@ -33,6 +33,15 @@ class SupplierController {
     async supplier_login(req, res) {
         try {
             const result = await login(req, res);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async supplier_logout(req, res) {
+        try {
+            const result = await logout(req);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -209,6 +218,15 @@ class SupplierController {
     async get_inventory_by_filter(req, res) {
         try {
             const result = await get_inventory_by_filter(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async supplier_personal_details(req, res) {
+        try {
+            const result = await updatePersonalDetails(req);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });

@@ -1,6 +1,7 @@
 import express from "express";
 const router = express.Router();
 import upload from "../middlewares/uploadMiddleware.js";
+import { auth } from "../middlewares/auth.js";
 
 import supplierController from "../controllers/supplierController.js";
 
@@ -8,14 +9,17 @@ router.post("/send-otp", supplierController.supplier_send_otp);
 router.post("/verify-otp", supplierController.supplier_verify_otp);
 router.post("/register", supplierController.supplier_register);
 router.post("/login", supplierController.supplier_login);
-router.post("/stores/bankAccountDetails", supplierController.supplier_bank_account_details);
-router.post("/stores/gstDetails", supplierController.supplier_gst_details);
+router.post("/logout", supplierController.supplier_logout);
+
+router.put("/profile/personalDetails", auth, supplierController.supplier_personal_details);
+router.post("/stores/bankAccountDetails", auth, supplierController.supplier_bank_account_details);
+router.post("/stores/gstDetails", auth, supplierController.supplier_gst_details);
 router.get("/getAllSupplier", supplierController.getAllSupplier);
-router.post("/stores/products", supplierController.upload_products);
-router.post("/stores/products/:product_id/variants", supplierController.upload_product_variants);
-router.post("/stores/variants/:variant_id/images", upload.array("images", 10), supplierController.add_product_images);
-router.post("/stores/warehouses", supplierController.create_warehouse);
-router.put("/stores/warehouses/:warehouse_id", supplierController.update_warehouse);
+router.post("/stores/products", auth, supplierController.upload_products);
+router.post("/stores/products/:product_id/variants", auth, supplierController.upload_product_variants);
+router.post("/stores/variants/:variant_id/images", upload.array("images", 10), auth, supplierController.add_product_images);
+router.post("/stores/warehouses", auth, supplierController.create_warehouse);
+router.put("/stores/warehouses/:warehouse_id", auth, supplierController.update_warehouse);
 router.get("/stores/warehouses/:warehouse_id", supplierController.get_warehouse);
 router.delete("/stores/warehouses/:warehouse_id", supplierController.delete_warehouse);
 router.post("/stores/inventory", supplierController.create_inventory);

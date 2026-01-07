@@ -84,12 +84,12 @@ export const signup = async (req, res) => {
       role,
     });
 
-    if(role === "SUPPLIER"){
+    if (role === "SUPPLIER") {
       await Supplier.create({
         name: name,
         email: email,
         password: hashedPassword,
-        account_status : "pending",
+        account_status: "pending",
       });
     }
 
@@ -127,18 +127,60 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
 
     // Generate JWT Token
-    const token = jwt.sign(
-      { id: user.user_id, role: user.role },
+    // const token = jwt.sign(
+    //   { id: user.user_id, role: user.role },
+    //   process.env.JWT_ACCESS_SECRET,
+    //   { expiresIn: "1d" }
+    // );
+     let supplier = null;
+    if(user.role === "SUPPLIER"){
+      supplier = await Supplier.findOne({ where: { email } });
+    }
+
+
+    // payload
+    const payload = {
+      supplierId: supplier.supplier_id,
+      role : user.role,
+    };
+
+
+    // 🔑 Tokens
+    const accessToken = jwt.sign(
+      payload,
       process.env.JWT_ACCESS_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "15m" }
     );
+
+    const refreshToken = jwt.sign(
+      payload,
+      process.env.JWT_REFRESH_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // 🍪 Cookies
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000
+    });
+
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
 
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      token,
+      token : accessToken,
+      refreshToken : refreshToken,
       data: {
         id: user.user_id,
+        supplier_id: supplier.supplier_id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -149,3 +191,16 @@ export const login = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie("access_token");
+    res.clearCookie("refresh_token");
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout Error:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+

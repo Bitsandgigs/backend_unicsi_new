@@ -170,6 +170,18 @@ export const login = async (req, res) => {
         return { success: false, error: error.message };
     }
 };
+
+export const logout = async (req, res) => {
+    try {
+        res.clearCookie("access_token");
+        res.clearCookie("refresh_token");
+        return { success: true, message: "Logged out successfully" };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+};
+
+
 export const profile = async (req, parameters) => {
     try {
         const supplier = await Supplier.findOne({ where: { id: req.user.id } });
@@ -180,6 +192,7 @@ export const profile = async (req, parameters) => {
 };
 export const updateProfile = async (req, parameters) => {
     try {
+        // const profileData = 
         const supplier = await Supplier.update(req.body, { where: { id: req.user.id } });
         return { success: true, data: supplier };
     } catch (error) {
@@ -509,6 +522,35 @@ export const get_inventory_by_filter = async (req) => {
     }
 }
 
+export const updatePersonalDetails = async (req) => {
+    try {
+        console.log("JWT Data:", req.user);
+        
+        // For all users
+        const { supplierId, role } = req.user;
+        
+        // For suppliers only
+        // const { phoneNumber, storeName, storeEmail } = req.user;
+        
+        if (role === "SUPPLIER" && supplierId) {
+            // const [updatedRows] = await Supplier.update(req.body, { 
+            //     where: { supplier_id: supplierId } 
+            // });
+
+            const supplier = await Supplier.findOne({ where: { supplier_id: supplierId } });
+
+            if (!supplier) {
+                return { success: false, msg: "Supplier not found!" };
+            }
+            
+            return { success: true, data: supplier };
+        }
+        
+        return { success: false, error: "Not a supplier" };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
 
 
 
