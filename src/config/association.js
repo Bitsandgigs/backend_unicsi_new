@@ -1,18 +1,19 @@
-import {  Supplier, SupplierAuth, SupplierKyc, SupplierAddress, Product, ProductVariant, ProductImage, Warehouse, Inventory, SupplierPricing, Reseller, Order, OrderItem, NdrCase, LedgerEntry } from "../models/index.js";
+import { Supplier, Product, ProductVariant, ProductImage, Warehouse, Inventory, SupplierPricing, Reseller, Order, OrderItem, NdrCase } from "../models/index.js";
+import { User } from "../models/User.js";
 
 /* ===========================
-   ASSOCIATIONS (MUST BE HERE)
-=========================== */
+    ASSOCIATIONS (MUST BE HERE)
+    =========================== */
 
 // Supplier core
-Supplier.hasOne(SupplierAuth, { foreignKey: "supplier_id" });
-Supplier.hasOne(SupplierKyc, { foreignKey: "supplier_id" });
-Supplier.hasMany(SupplierAddress, { foreignKey: "supplier_id" });
+// Supplier.hasOne(SupplierAuth, { foreignKey: "supplier_id" });
+// Supplier.hasOne(SupplierKyc, { foreignKey: "supplier_id" });
+// Supplier.hasMany(SupplierAddress, { foreignKey: "supplier_id" });
 // Supplier.hasMany(SupplierToken, { foreignKey: "supplier_id" });
 
-SupplierAuth.belongsTo(Supplier);
-SupplierKyc.belongsTo(Supplier);
-SupplierAddress.belongsTo(Supplier);
+// SupplierAuth.belongsTo(Supplier);
+// SupplierKyc.belongsTo(Supplier);
+// SupplierAddress.belongsTo(Supplier);
 // SupplierToken.belongsTo(Supplier);
 
 // Supplier → Product
@@ -69,5 +70,10 @@ OrderItem.belongsTo(Order);
 
 OrderItem.hasOne(NdrCase, { foreignKey: "order_item_id" });
 NdrCase.belongsTo(OrderItem);
+
+// User.hasOne(Supplier, { foreignKey: "user_id" });
+// Supplier.belongsTo(User, { foreignKey: "user_id" });
+
+
 
 

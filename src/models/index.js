@@ -1,5 +1,5 @@
 import { Supplier } from "./suppliers.js";
-import { SupplierAuth } from "./supplier_auth.js";
+// import { SupplierAuth } from "./supplier_auth.js";
 import { SupplierKyc } from "./supplier_kyc.js";
 import { SupplierAddress } from "./supplier_addresses.js";
 // import { SupplierToken } from "./supplier_tokens.js";
@@ -19,7 +19,7 @@ import { OrderStatusHistory } from "./order_status_history.js";
 
 export {
     Supplier,
-    SupplierAuth,
+    // SupplierAuth,
     SupplierKyc,
     SupplierAddress,
     // SupplierToken,

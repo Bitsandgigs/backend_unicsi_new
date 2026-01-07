@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { sendOTP, verifyOTP } from "../services/otpService.js";
 import { User } from "../models/User.js";
+import { Supplier } from "../models/index.js";
 
 /**
  * Step 1: Send OTP to a user's email for verification
@@ -83,11 +84,20 @@ export const signup = async (req, res) => {
       role,
     });
 
+    if(role === "SUPPLIER"){
+      await Supplier.create({
+        name: name,
+        email: email,
+        password: hashedPassword,
+        account_status : "pending",
+      });
+    }
+
     return res.status(201).json({
       success: true,
       message: "User registered successfully",
       data: {
-        id: user.id,
+        id: user.user_id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -118,8 +128,8 @@ export const login = async (req, res) => {
 
     // Generate JWT Token
     const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET,
+      { id: user.user_id, role: user.role },
+      process.env.JWT_ACCESS_SECRET,
       { expiresIn: "1d" }
     );
 
@@ -128,7 +138,7 @@ export const login = async (req, res) => {
       message: "Login successful",
       token,
       data: {
-        id: user.id,
+        id: user.user_id,
         name: user.name,
         email: user.email,
         role: user.role,

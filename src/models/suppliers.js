@@ -31,10 +31,10 @@ export const Supplier = sequelize.define("suppliers", {
         type: DataTypes.STRING,
     },
 
-    role: {
-        type: DataTypes.ENUM("supplier", "admin"),
-        defaultValue: "supplier",
-    },
+    // role: {
+    //     type: DataTypes.ENUM("supplier", "admin"),
+    //     defaultValue: "supplier",
+    // },
 
     account_status: {
         type: DataTypes.ENUM("pending", "active", "suspended", "blocked"),
