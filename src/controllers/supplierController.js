@@ -1,4 +1,4 @@
-import { signup, login, profile, signup_send_otp, add_bank_details, add_gst_details, getAllSupplier, upload_products, upload_product_variants, add_product_images, create_warehouse, update_warehouse, get_warehouse, delete_warehouse, create_inventory, update_inventory_stock, get_inventory, delete_inventory, get_inventory_by_filter, logout, updatePersonalDetails } from "../utils/supplierFnc.js";
+import { signup, login, profile, signup_send_otp, add_bank_details, add_gst_details, getAllSupplier, upload_products, upload_product_variants, add_product_images, create_warehouse, update_warehouse, get_warehouse, delete_warehouse, create_inventory, update_inventory_stock, get_inventory, delete_inventory, get_inventory_by_filter, logout, updatePersonalDetails, get_bank_account_details } from "../utils/supplierFnc.js";
 
 class SupplierController {
 
@@ -57,41 +57,50 @@ class SupplierController {
         }
     }
 
-    async supplier_update_profile(req, res) {
-        try {
-            const result = await profile(req);
-            res.json(result);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    }
+    // async supplier_update_profile(req, res) {
+    //     try {
+    //         const result = await profile(req);
+    //         res.json(result);
+    //     } catch (error) {
+    //         res.status(500).json({ error: error.message });
+    //     }
+    // }
 
-    async supplier_update_password(req, res) {
-        try {
-            const result = await profile(req);
-            res.json(result);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    }
+    // async supplier_update_password(req, res) {
+    //     try {
+    //         const result = await profile(req);
+    //         res.json(result);
+    //     } catch (error) {
+    //         res.status(500).json({ error: error.message });
+    //     }
+    // }
 
-    async supplier_update_profile(req, res) {
-        try {
-            const result = await profile(req);
-            res.json(result);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
+    // async supplier_update_profile(req, res) {
+    //     try {
+    //         const result = await profile(req);
+    //         res.json(result);
+    //     } catch (error) {
+    //         res.status(500).json({ error: error.message });
+    //     }
 
-    }
+    // }
 
-    async supplier_update_password(req, res) {
+    // async supplier_update_password(req, res) {
 
-    }
+    // }
 
     async supplier_bank_account_details(req, res) {
         try {
-            const result = await add_bank_details(req.body, req.params.supplierId);
+            const result = await add_bank_details(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async get_bank_account_details(req, res) {
+        try {
+            const result = await get_bank_account_details(req);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });

@@ -1,4 +1,4 @@
-import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory } from "../models/index.js";
+import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory,supplier_bank_details } from "../models/index.js";
 import { Op } from "sequelize";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -182,54 +182,103 @@ export const logout = async (req, res) => {
 };
 
 
-export const profile = async (req, parameters) => {
+export const profile = async (req) => {
     try {
-        const supplier = await Supplier.findOne({ where: { id: req.user.id } });
-        return { success: true, data: supplier };
-    } catch (error) {
-        return { success: false, error: error.message };
-    }
-};
-export const updateProfile = async (req, parameters) => {
-    try {
-        // const profileData = 
-        const supplier = await Supplier.update(req.body, { where: { id: req.user.id } });
+
+        // get supplier id from token
+        const { supplierId, role } = req.user;
+
+        console.log(supplierId, role);
+
+        if(!supplierId || !role) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        if(role !== "SUPPLIER") {
+            return { success: false, error: "Unauthorized" };
+        }
+        
+        // get supplier details
+        const supplier = await Supplier.findOne({ where: { supplier_id: supplierId } });
+        
+        // check if supplier exists
+        if(!supplier) {
+            return { success: false, error: "Supplier not found" };
+        }
         return { success: true, data: supplier };
     } catch (error) {
         return { success: false, error: error.message };
     }
 };
 
-export const updatePassword = async (req, parameters) => {
+
+
+export const updateProfile = async (req) => {
     try {
-        const supplier = await Supplier.update(req.body, { where: { id: req.user.id } });
+        const { supplierId, role } = req.user;
+
+        if(role !== "supplier") {
+            return { success: false, error: "Unauthorized" };
+        }
+        
+        const supplier = await Supplier.update(req.body, { where: { supplier_id: supplierId } });
         return { success: true, data: supplier };
     } catch (error) {
         return { success: false, error: error.message };
     }
 };
 
-export const add_bank_details = async (body_data, supplierId) => {
+export const updatePassword = async (req) => {
     try {
-        if (!body_data.bank_name || !body_data.account_number || !body_data.ifsc_code || !body_data.branch_name) {
+        const { supplierId, role } = req.user;
+
+        if(role !== "supplier") {
+            return { success: false, error: "Unauthorized" };
+        }
+        
+        const supplier = await Supplier.update(req.body, { where: { supplier_id: supplierId } });
+        return { success: true, data: supplier };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+};
+
+export const add_bank_details = async (req) => {
+    try {
+        const { supplierId, role } = req.user;
+
+        if(role !== "SUPPLIER") {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        if(!supplierId) {
+            return { success: false, error: "Unauthorized" };
+        }
+        
+        if (!req.body.holderName || !req.body.accountNumber || !req.body.reAccountNumber || !req.body.ifsc) {
             return { success: false, error: "All fields are required!" };
         }
-        const { bank_name, account_number, ifsc_code, branch_name, supplierId } = body_data;
 
-        const is_exist = await supplier_bank_details.findOne({ where: { supplier_id: supplierId } });
+        const { holderName, accountNumber, reAccountNumber, ifsc } = req.body;
 
-        console.log(is_exist);
+        const payload = {
+            account_number : accountNumber,
+            ifsc_code : ifsc,
+            account_holder_name : holderName,
+            bank_name : "",
+            supplier_id : supplierId,
+            branch_name : ""
+        }
 
-        if (is_exist) {
-            return { success: false, msg: "Bank Details exist!" };
+        // const is_exist = await supplier_bank_details.findOne({ where: { supplier_id: supplierId } });
+
+        console.log(payload);
+
+        const data = await supplier_bank_details.create(payload);
+        if (data) {
+            return { success: true, data: data };
         } else {
-            const data = await supplier_bank_details.create({ bank_name, account_number, ifsc_code, branch_name, supplier_id: supplierId });
-            await supplier_bank_details.update({ bank_details_status: true }, { where: { supplier_id: supplierId } });
-            if (data) {
-                return { success: true, data: data };
-            } else {
-                return { success: false, msg: "Bank Details not added!" };
-            }
+            return { success: false, msg: "Bank Details not added!" };
         }
     } catch (error) {
         return { success: false, error: error.message };
@@ -528,6 +577,13 @@ export const updatePersonalDetails = async (req) => {
         
         // For all users
         const { supplierId, role } = req.user;
+        const { phoneNumber, storeName, storeEmail } = req.body;
+
+        console.log("Supplier ID:", supplierId);
+        console.log("Role:", role);
+        console.log("Phone Number:", phoneNumber);
+        console.log("Store Name:", storeName);
+        console.log("Store Email:", storeEmail);
         
         // For suppliers only
         // const { phoneNumber, storeName, storeEmail } = req.user;
@@ -543,7 +599,13 @@ export const updatePersonalDetails = async (req) => {
                 return { success: false, msg: "Supplier not found!" };
             }
             
-            return { success: true, data: supplier };
+            supplier.number = phoneNumber;
+            supplier.name = storeName;
+            supplier.email = storeEmail;
+
+            const updatedSupplier = await supplier.save();
+            
+            return { success: true, data: updatedSupplier };
         }
         
         return { success: false, error: "Not a supplier" };
@@ -551,6 +613,28 @@ export const updatePersonalDetails = async (req) => {
         return { success: false, error: error.message };
     }
 }
+
+//bank details
+export const get_bank_account_details = async (req) => {
+    try {
+        const { supplierId, role } = req.user;
+        if (role !== "SUPPLIER") {
+            return { success: false, error: "Not a supplier" };
+        }
+
+        if (!supplierId) {
+            return { success: false, error: "Supplier ID is required" };
+        }
+        const bankDetails = await supplier_bank_details.findOne({ where: { supplier_id: supplierId } });
+        if (!bankDetails) {
+            return { success: false, msg: "Bank details not found!" };
+        }
+        return { success: true, data: bankDetails };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
 
 
 

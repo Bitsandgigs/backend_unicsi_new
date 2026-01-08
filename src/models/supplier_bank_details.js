@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
+
 export const supplier_bank_details = sequelize.define("supplier_bank_details", {
 
     supplier_bank_info_id: {
@@ -19,24 +20,28 @@ export const supplier_bank_details = sequelize.define("supplier_bank_details", {
     },
     bank_name: {
         type: DataTypes.STRING,
-        allowNull: false
+        defaultValue: null
     },
+    account_holder_name: {
+        type: DataTypes.STRING,
+        defaultValue: null
+    },
+
     account_number: {
         type: DataTypes.STRING,
-        allowNull: false
+        defaultValue: null
     },
     ifsc_code: {
         type: DataTypes.STRING,
-        allowNull: false
+        defaultValue: null
 
     },
     branch_name: {
         type: DataTypes.STRING,
-        allowNull: false
+        defaultValue: null
     },
     bank_details_status : {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
         defaultValue: true
     },
     created_at: {

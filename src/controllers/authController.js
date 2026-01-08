@@ -132,12 +132,14 @@ export const login = async (req, res) => {
     //   process.env.JWT_ACCESS_SECRET,
     //   { expiresIn: "1d" }
     // );
+
+    console.log(user);
      let supplier = null;
     if(user.role === "SUPPLIER"){
       supplier = await Supplier.findOne({ where: { email } });
     }
-
-
+  
+    console.log("supplier123=> " ,supplier);
     // payload
     const payload = {
       supplierId: supplier.supplier_id,
@@ -149,7 +151,7 @@ export const login = async (req, res) => {
     const accessToken = jwt.sign(
       payload,
       process.env.JWT_ACCESS_SECRET,
-      { expiresIn: "15m" }
+      { expiresIn: "1h" }
     );
 
     const refreshToken = jwt.sign(
@@ -163,7 +165,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "strict",
-      maxAge: 15 * 60 * 1000
+      maxAge: 1 * 60 * 60 * 1000
     });
 
     res.cookie("refresh_token", refreshToken, {

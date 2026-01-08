@@ -16,6 +16,7 @@ import { LedgerEntry } from "./ledger_entries.js";
 import { Order } from "./Order.js";
 import { OrderItem } from "./order_items.js";
 import { OrderStatusHistory } from "./order_status_history.js";
+import { supplier_bank_details } from "./supplier_bank_details.js";
 
 export {
     Supplier,
@@ -35,5 +36,6 @@ export {
     LedgerEntry,
     Order,
     OrderItem,
-    OrderStatusHistory
+    OrderStatusHistory,
+    supplier_bank_details
 }

@@ -10,10 +10,18 @@ router.post("/verify-otp", supplierController.supplier_verify_otp);
 router.post("/register", supplierController.supplier_register);
 router.post("/login", supplierController.supplier_login);
 router.post("/logout", supplierController.supplier_logout);
-
+// profile
+router.get("/profile/personalDetails", auth, supplierController.supplier_profile);
 router.put("/profile/personalDetails", auth, supplierController.supplier_personal_details);
+
+//bank account
+router.get("/stores/bankAccountDetails", auth, supplierController.get_bank_account_details);
 router.post("/stores/bankAccountDetails", auth, supplierController.supplier_bank_account_details);
+
+//gst details
 router.post("/stores/gstDetails", auth, supplierController.supplier_gst_details);
+
+//products
 router.get("/getAllSupplier", supplierController.getAllSupplier);
 router.post("/stores/products", auth, supplierController.upload_products);
 router.post("/stores/products/:product_id/variants", auth, supplierController.upload_product_variants);
