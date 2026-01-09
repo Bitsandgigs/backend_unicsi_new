@@ -17,6 +17,7 @@ router.put("/profile/personalDetails", auth, supplierController.supplier_persona
 //bank account
 router.get("/stores/bankAccountDetails", auth, supplierController.get_bank_account_details);
 router.post("/stores/bankAccountDetails", auth, supplierController.supplier_bank_account_details);
+router.put("/stores/bankAccountDetails", auth, supplierController.update_bank_account_details);
 
 //gst details
 router.post("/stores/gstDetails", auth, supplierController.supplier_gst_details);

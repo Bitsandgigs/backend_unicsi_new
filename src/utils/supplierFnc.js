@@ -635,9 +635,45 @@ export const get_bank_account_details = async (req) => {
     }
 }
 
+export const update_bank_details = async (req) => {
+    try {
+        const { supplierId, role } = req.user;
+
+        // for supplier only
+        if (role !== "SUPPLIER") {
+            return { success: false, error: "Not a supplier" };
+        }
+
+        const {accountNumber, ifsc, holderName } = req.body;
+        console.log("hello")
+
+        if (!supplierId) {
+            return { success: false, error: "Supplier ID is required" };
+        }
+        const bankDetails = await supplier_bank_details.findOne({ where: { supplier_id: supplierId } });
+        if (!bankDetails) {
+            return { success: false, msg: "Bank details not found!" };
+        }
+        bankDetails.account_number = accountNumber;
+        bankDetails.ifsc_code = ifsc;
+        bankDetails.account_holder_name = holderName;
+        await bankDetails.save();
+
+        return { success: true, data: bankDetails };    
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
 
 
-
+        // const payload = {
+        //     account_number : accountNumber,
+        //     ifsc_code : ifsc,
+        //     account_holder_name : holderName,
+        //     bank_name : "",
+        //     supplier_id : supplierId,
+        //     branch_name : ""
+        // }
 
 
 
