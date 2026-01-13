@@ -33,8 +33,8 @@ router.get("/stores/gstDetails", auth, supplierController.get_gst_details);
 router.get("/getAllSupplier", auth, supplierController.getAllSupplier);
 
 //products
-router.post("/stores/products", auth, supplierController.add_products);
-router.post("/stores/products/:product_id/variants", auth, supplierController.add_product_variants);
+router.post("/stores/products", auth, upload.array("images", 10), supplierController.add_products);
+router.post("/stores/products/:product_id/variants", auth, upload.array("images", 10), supplierController.add_product_variants);
 router.post("/stores/variants/:variant_id/images", upload.array("images", 10), auth, supplierController.add_product_images);
 
 

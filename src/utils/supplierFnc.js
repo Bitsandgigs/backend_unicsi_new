@@ -1,4 +1,4 @@
-import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory,supplier_bank_details, supplier_gst_details } from "../models/index.js";
+import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory, supplier_bank_details, supplier_gst_details } from "../models/index.js";
 import { Op } from "sequelize";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -191,19 +191,19 @@ export const profile = async (req) => {
 
         console.log(supplierId, role);
 
-        if(!supplierId || !role) {
+        if (!supplierId || !role) {
             return { success: false, error: "Unauthorized" };
         }
 
-        if(role !== "SUPPLIER") {
+        if (role !== "SUPPLIER") {
             return { success: false, error: "Unauthorized" };
         }
-        
+
         // get supplier details
         const supplier = await Supplier.findOne({ where: { supplier_id: supplierId } });
-        
+
         // check if supplier exists
-        if(!supplier) {
+        if (!supplier) {
             return { success: false, error: "Supplier not found" };
         }
         return { success: true, data: supplier };
@@ -218,10 +218,10 @@ export const updateProfile = async (req) => {
     try {
         const { supplierId, role } = req.user;
 
-        if(role !== "supplier") {
+        if (role !== "supplier") {
             return { success: false, error: "Unauthorized" };
         }
-        
+
         const supplier = await Supplier.update(req.body, { where: { supplier_id: supplierId } });
         return { success: true, data: supplier };
     } catch (error) {
@@ -233,10 +233,10 @@ export const updatePassword = async (req) => {
     try {
         const { supplierId, role } = req.user;
 
-        if(role !== "supplier") {
+        if (role !== "supplier") {
             return { success: false, error: "Unauthorized" };
         }
-        
+
         const supplier = await Supplier.update(req.body, { where: { supplier_id: supplierId } });
         return { success: true, data: supplier };
     } catch (error) {
@@ -248,14 +248,14 @@ export const add_bank_details = async (req) => {
     try {
         const { supplierId, role } = req.user;
 
-        if(role !== "SUPPLIER") {
+        if (role !== "SUPPLIER") {
             return { success: false, error: "Unauthorized" };
         }
 
-        if(!supplierId) {
+        if (!supplierId) {
             return { success: false, error: "Unauthorized" };
         }
-        
+
         if (!req.body.holderName || !req.body.accountNumber || !req.body.reAccountNumber || !req.body.ifsc) {
             return { success: false, error: "All fields are required!" };
         }
@@ -263,12 +263,12 @@ export const add_bank_details = async (req) => {
         const { holderName, accountNumber, reAccountNumber, ifsc } = req.body;
 
         const payload = {
-            account_number : accountNumber,
-            ifsc_code : ifsc,
-            account_holder_name : holderName,
-            bank_name : "",
-            supplier_id : supplierId,
-            branch_name : ""
+            account_number: accountNumber,
+            ifsc_code: ifsc,
+            account_holder_name: holderName,
+            bank_name: "",
+            supplier_id: supplierId,
+            branch_name: ""
         }
 
         // const is_exist = await supplier_bank_details.findOne({ where: { supplier_id: supplierId } });
@@ -287,70 +287,70 @@ export const add_bank_details = async (req) => {
 };
 
 export const add_gst_details = async (req) => {
-try {
-    const { supplierId, role } = req.user;
+    try {
+        const { supplierId, role } = req.user;
 
-    if (role !== "SUPPLIER") {
-      return { success: false, error: "Unauthorized" };
+        if (role !== "SUPPLIER") {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        const { gstName, gstNumber, panCardNumber, adharCardNumber } = req.body;
+        console.log("")
+
+        if (!gstName || !gstNumber || !panCardNumber) {
+            return { success: false, error: "All fields are required!" };
+        }
+
+        // const publicPath = `uploads/images/${file.filename}`.replace(/\\/g, "/");
+
+        // Get Files safely
+        const gstCertificate = `uploads/images/${req.files?.gstCertificate?.[0]?.filename}`;
+
+        //   req.files?.gstCertificate?.[0]?.path || null;
+        //   publicPath;
+        const panCardNumberImage =
+            `uploads/images/${req.files?.panCardNumberImage?.[0]?.filename}`;
+        const adharCardNumberImage =
+            `uploads/images/${req.files?.adharCardNumberImage?.[0]?.filename}`;
+
+        // const is_exist = await supplier_gst_details.findOne({
+        //   where: { supplier_id: supplierId },
+        // });
+
+        console.log("gstCertificate", gstCertificate);
+        console.log("panCardNumberImage", panCardNumberImage);
+        console.log("adharCardNumberImage", adharCardNumberImage);
+
+        const gstPayload = {
+            gst_number: gstNumber,
+            gst_name: gstName,
+            pan_number: panCardNumber,
+            andhar_number: adharCardNumber,
+            gst_image: `${req.protocol}://${req.get("host")}/${gstCertificate}`,
+            pan_image: `${req.protocol}://${req.get("host")}/${panCardNumberImage}`,
+            andhar_image: `${req.protocol}://${req.get("host")}/${adharCardNumberImage}`,
+            supplier_id: supplierId,
+        }
+
+        // return { success: true, data:  gstPayload};
+
+
+
+        // if (is_exist) {
+        //   return res.json({ success: false, msg: "GST Details exist!" });
+        // }
+
+        const data = await supplier_gst_details.create(gstPayload);
+
+        await supplier_gst_details.update(
+            { gst_validity: new Date(), gst_details_status: true },
+            { where: { supplier_id: supplierId } }
+        );
+
+        return { success: true, data };
+    } catch (error) {
+        return { success: false, error: error.message };
     }
-
-    const { gstName, gstNumber, panCardNumber, adharCardNumber } = req.body;
-    console.log("")
-
-    if (!gstName || !gstNumber || !panCardNumber) {
-      return { success: false, error: "All fields are required!" };
-    }
-    
-    // const publicPath = `uploads/images/${file.filename}`.replace(/\\/g, "/");
-
-    // Get Files safely
-    const gstCertificate = `uploads/images/${req.files?.gstCertificate?.[0]?.filename}`;
-
-    //   req.files?.gstCertificate?.[0]?.path || null;
-    //   publicPath;
-    const panCardNumberImage =
-      `uploads/images/${req.files?.panCardNumberImage?.[0]?.filename}`;
-    const adharCardNumberImage =
-      `uploads/images/${req.files?.adharCardNumberImage?.[0]?.filename}`;
-
-    // const is_exist = await supplier_gst_details.findOne({
-    //   where: { supplier_id: supplierId },
-    // });
-
-    console.log("gstCertificate", gstCertificate);
-    console.log("panCardNumberImage", panCardNumberImage);
-    console.log("adharCardNumberImage", adharCardNumberImage);
-
-    const gstPayload = {
-        gst_number: gstNumber,
-        gst_name: gstName,
-        pan_number: panCardNumber,
-        andhar_number: adharCardNumber,
-        gst_image: `${req.protocol}://${req.get("host")}/${gstCertificate}`,
-        pan_image: `${req.protocol}://${req.get("host")}/${panCardNumberImage}`,
-        andhar_image: `${req.protocol}://${req.get("host")}/${adharCardNumberImage}`,
-        supplier_id: supplierId,
-    }
-
-    // return { success: true, data:  gstPayload};
-
-
-
-    // if (is_exist) {
-    //   return res.json({ success: false, msg: "GST Details exist!" });
-    // }
-
-    const data = await supplier_gst_details.create(gstPayload);
-
-    await supplier_gst_details.update(
-      { gst_validity: new Date(), gst_details_status: true },
-      { where: { supplier_id: supplierId } }
-    );
-
-    return { success: true, data };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
 }
 
 export const getAllSupplier = async () => {
@@ -364,35 +364,92 @@ export const getAllSupplier = async () => {
 
 
 export const add_products = async (req) => {
-    try {
-        
-        const { supplierId, role } = req.user;
+  try {
+    const { supplierId, role } = req.user
 
-        if(role !== "SUPPLIER") {
-            return { success: false, error: "Unauthorized" };
-        }
-
-        // check if supplierId is present
-        if (!supplierId) {
-            return { success: false, error: "Unauthorized" };
-        }
-
-        if (!req.body.title || !req.body.description || !req.body.brand || !req.body.approval_status) {
-            return { success: false, error: "All fields are required!" };
-        }
-
-
-        const { title, description, brand, approval_status } = req.body;
-        const data = await Product.create({ supplier_id: supplierId, title, description, brand, approval_status });
-        if (data) {
-            return { success: true, data: data };
-        } else {
-            return { success: false, msg: "Product not added!" };
-        }
-    } catch (error) {
-        return { success: false, error: error.message };
+    if (role !== "SUPPLIER") {
+      return { success: false, error: "Unauthorized - Only suppliers can add products" }
     }
+
+    if (!supplierId) {
+      return { success: false, error: "Unauthorized - Supplier ID not found" }
+    }
+
+    const { title, description, brand, approval_status } = req.body
+
+    if (!title || !description || !brand || !approval_status) {
+      return { success: false, error: "All fields (title, description, brand, approval_status) are required!" }
+    }
+
+    if (description.length > 10000) {
+      return { success: false, error: "Description should be less than 10000 characters!" }
+    }
+    if (title.length > 100) {
+      return { success: false, error: "Title should be less than 100 characters!" }
+    }
+
+    const { categoryId, variants = [] } = req.body
+
+    if (!variants || variants.length === 0) {
+      return { success: false, error: "At least one variant is required!" }
+    }
+
+    // Create the product
+    const product = await Product.create({
+      supplier_id: supplierId,
+      title,
+      description,
+      brand,
+      approval_status,
+      categoryId,
+    })
+
+    const productId = product.product_id
+
+    const createdVariants = []
+    for (const variant of variants) {
+      const { images, ...variantData } = variant // Destructure images from variant
+      const variantRecord = await ProductVariant.create({
+        product_id: productId,
+        ...variantData,
+      })
+      createdVariants.push(variantRecord)
+    }
+
+    let imagesCreated = false
+    if (req.files && req.files.length > 0) {
+      const imagesPayload = req.files.map((file, index) => {
+        const publicPath = `uploads/images/${file.filename}`.replace(/\\/g, "/")
+        return {
+          product_id: productId,
+          image_url: `${req.protocol}://${req.get("host")}/${publicPath}`,
+          sort_order: index,
+        }
+      })
+
+      await ProductImage.bulkCreate(imagesPayload)
+      imagesCreated = true
+    }
+
+    return {
+      success: true,
+      data: {
+        product_id: productId,
+        title,
+        brand,
+        variantCount: createdVariants.length,
+        imagesCount: req.files ? req.files.length : 0,
+        approval_status,
+        createdAt: new Date().toISOString(),
+      },
+      message: `Product created successfully with ${createdVariants.length} variant(s)${imagesCreated ? ` and ${req.files.length} image(s)` : ""}`,
+    }
+  } catch (error) {
+    console.error("[v0] Add products error:", error)
+    return { success: false, error: error.message || "Failed to add product" }
+  }
 }
+
 
 
 export const add_product_variants = async (req) => {
@@ -649,7 +706,7 @@ export const get_inventory_by_filter = async (req) => {
 export const updatePersonalDetails = async (req) => {
     try {
         console.log("JWT Data:", req.user);
-        
+
         // For all users
         const { supplierId, role } = req.user;
         const { phoneNumber, storeName, storeEmail } = req.body;
@@ -659,10 +716,10 @@ export const updatePersonalDetails = async (req) => {
         console.log("Phone Number:", phoneNumber);
         console.log("Store Name:", storeName);
         console.log("Store Email:", storeEmail);
-        
+
         // For suppliers only
         // const { phoneNumber, storeName, storeEmail } = req.user;
-        
+
         if (role === "SUPPLIER" && supplierId) {
             // const [updatedRows] = await Supplier.update(req.body, { 
             //     where: { supplier_id: supplierId } 
@@ -673,16 +730,16 @@ export const updatePersonalDetails = async (req) => {
             if (!supplier) {
                 return { success: false, msg: "Supplier not found!" };
             }
-            
+
             supplier.number = phoneNumber;
             supplier.name = storeName;
             supplier.email = storeEmail;
 
             const updatedSupplier = await supplier.save();
-            
+
             return { success: true, data: updatedSupplier };
         }
-        
+
         return { success: false, error: "Not a supplier" };
     } catch (error) {
         return { success: false, error: error.message };
@@ -719,7 +776,7 @@ export const update_bank_details = async (req) => {
             return { success: false, error: "Not a supplier" };
         }
 
-        const {accountNumber, ifsc, holderName } = req.body;
+        const { accountNumber, ifsc, holderName } = req.body;
         console.log("hello")
 
         if (!supplierId) {
@@ -734,7 +791,7 @@ export const update_bank_details = async (req) => {
         bankDetails.account_holder_name = holderName;
         await bankDetails.save();
 
-        return { success: true, data: bankDetails };    
+        return { success: true, data: bankDetails };
     } catch (error) {
         return { success: false, error: error.message };
     }
