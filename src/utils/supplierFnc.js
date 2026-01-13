@@ -1,7 +1,8 @@
-import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory,supplier_bank_details } from "../models/index.js";
+import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory,supplier_bank_details, supplier_gst_details } from "../models/index.js";
 import { Op } from "sequelize";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import upload from "../middlewares/uploadMiddleware.js";
 
 
 export const signup_send_otp = async (req) => {
@@ -285,34 +286,71 @@ export const add_bank_details = async (req) => {
     }
 };
 
-export const add_gst_details = async (body_data, supplierId) => {
-    try {
-        if (!body_data.gst_number || !body_data.pan_number) {
-            return { success: false, error: "All fields are required!" };
-        }
-        const { gst_number, gst_name, pan_number, supplierId } = body_data;
+export const add_gst_details = async (req) => {
+try {
+    const { supplierId, role } = req.user;
 
-        console.log(body_data);
-
-        const panImg = body_data.pan_image || "";
-        const gstImg = body_data.gst_image || "";
-
-        const is_exist = await supplier_gst_details.findOne({ where: { supplier_id: supplierId } });
-
-        if (is_exist) {
-            return { success: false, msg: "GST Details exist!" };
-        } else {
-            const data = await supplier_gst_details.create({ gst_number, gst_name, pan_number, pan_image: panImg, gst_image: gstImg, supplier_id: supplierId });
-            await supplier_gst_details.update({ gst_validity: new Date(), gst_details_status: true }, { where: { supplier_id: supplierId } });
-            if (data) {
-                return { success: true, data: data };
-            } else {
-                return { success: false, msg: "GST Details not added!" };
-            }
-        }
-    } catch (error) {
-        return { success: false, error: error.message };
+    if (role !== "SUPPLIER") {
+      return { success: false, error: "Unauthorized" };
     }
+
+    const { gstName, gstNumber, panCardNumber, adharCardNumber } = req.body;
+    console.log("")
+
+    if (!gstName || !gstNumber || !panCardNumber) {
+      return { success: false, error: "All fields are required!" };
+    }
+    
+    // const publicPath = `uploads/images/${file.filename}`.replace(/\\/g, "/");
+
+    // Get Files safely
+    const gstCertificate = `uploads/images/${req.files?.gstCertificate?.[0]?.filename}`;
+
+    //   req.files?.gstCertificate?.[0]?.path || null;
+    //   publicPath;
+    const panCardNumberImage =
+      `uploads/images/${req.files?.panCardNumberImage?.[0]?.filename}`;
+    const adharCardNumberImage =
+      `uploads/images/${req.files?.adharCardNumberImage?.[0]?.filename}`;
+
+    // const is_exist = await supplier_gst_details.findOne({
+    //   where: { supplier_id: supplierId },
+    // });
+
+    console.log("gstCertificate", gstCertificate);
+    console.log("panCardNumberImage", panCardNumberImage);
+    console.log("adharCardNumberImage", adharCardNumberImage);
+
+    const gstPayload = {
+        gst_number: gstNumber,
+        gst_name: gstName,
+        pan_number: panCardNumber,
+        andhar_number: adharCardNumber,
+        gst_image: `${req.protocol}://${req.get("host")}/${gstCertificate}`,
+        pan_image: `${req.protocol}://${req.get("host")}/${panCardNumberImage}`,
+        andhar_image: `${req.protocol}://${req.get("host")}/${adharCardNumberImage}`,
+        supplier_id: supplierId,
+    }
+
+    // return { success: true, data:  gstPayload};
+
+
+
+    // if (is_exist) {
+    //   return res.json({ success: false, msg: "GST Details exist!" });
+    // }
+
+    const data = await supplier_gst_details.create(gstPayload);
+
+    await supplier_gst_details.update(
+      { gst_validity: new Date(), gst_details_status: true },
+      { where: { supplier_id: supplierId } }
+    );
+
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 }
 
 export const getAllSupplier = async () => {
@@ -325,13 +363,27 @@ export const getAllSupplier = async () => {
 }
 
 
-export const upload_products = async (body_data) => {
+export const add_products = async (req) => {
     try {
-        if (!body_data.title || !body_data.description || !body_data.brand || !body_data.approval_status) {
+        
+        const { supplierId, role } = req.user;
+
+        if(role !== "SUPPLIER") {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        // check if supplierId is present
+        if (!supplierId) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        if (!req.body.title || !req.body.description || !req.body.brand || !req.body.approval_status) {
             return { success: false, error: "All fields are required!" };
         }
-        const { supplier_id, title, description, brand, approval_status } = body_data;
-        const data = await Product.create({ supplier_id, title, description, brand, approval_status });
+
+
+        const { title, description, brand, approval_status } = req.body;
+        const data = await Product.create({ supplier_id: supplierId, title, description, brand, approval_status });
         if (data) {
             return { success: true, data: data };
         } else {
@@ -343,7 +395,7 @@ export const upload_products = async (body_data) => {
 }
 
 
-export const upload_product_variants = async (req) => {
+export const add_product_variants = async (req) => {
     try {
         const product_id = req.params.product_id;
         if (!product_id || !req.body.variant_name || !req.body.variant_price || !req.body.variant_stock) {
@@ -396,6 +448,29 @@ export const add_product_images = async (req) => {
         return { success: false, error: error.message };
     }
 };
+
+export const get_gst_details = async (req) => {
+    try {
+        const { supplierId, role } = req.user;
+
+        if (role !== "SUPPLIER") {
+            return { success: false, error: "Unauthorized!" };
+        }
+
+        if (!supplierId) {
+            return { success: false, error: "supplier_id is required" };
+        }
+
+        const data = await supplier_gst_details.findOne({ where: { supplier_id: supplierId } });
+        if (data) {
+            return { success: true, data: data };
+        } else {
+            return { success: false, msg: "GST Details not found!" };
+        }
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
 
 export const create_warehouse = async (req) => {
     try {
@@ -666,14 +741,6 @@ export const update_bank_details = async (req) => {
 }
 
 
-        // const payload = {
-        //     account_number : accountNumber,
-        //     ifsc_code : ifsc,
-        //     account_holder_name : holderName,
-        //     bank_name : "",
-        //     supplier_id : supplierId,
-        //     branch_name : ""
-        // }
 
 
 

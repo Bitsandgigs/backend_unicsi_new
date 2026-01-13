@@ -11,6 +11,10 @@ export const supplier_gst_details = sequelize.define("supplier_gst_details", {
     supplier_id: {
         type: DataTypes.UUID,
         allowNull: false,
+        references: {
+            model: "suppliers",
+            key: "supplier_id",
+        },
     },
     gst_number: {
         type: DataTypes.STRING,
