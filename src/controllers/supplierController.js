@@ -1,4 +1,5 @@
-import { signup, login, profile, signup_send_otp, add_bank_details, add_gst_details, getAllSupplier, add_products, add_product_variants, add_product_images, create_warehouse, update_warehouse, get_warehouse, delete_warehouse, create_inventory, update_inventory_stock, get_inventory, delete_inventory, get_inventory_by_filter, logout, updatePersonalDetails, get_bank_account_details, update_bank_details, get_gst_details } from "../utils/supplierFnc.js";
+import { signup, login, profile, signup_send_otp, add_bank_details, add_gst_details, getAllSupplier, add_products, add_product_variants, add_product_images, create_warehouse, update_warehouse, get_warehouse, delete_warehouse, create_inventory, update_inventory_stock, get_inventory, delete_inventory, get_inventory_by_filter, logout, updatePersonalDetails, get_bank_account_details, update_bank_details, get_gst_details, get_products } from "../utils/supplierFnc.js";
+
 
 class SupplierController {
 
@@ -146,6 +147,15 @@ class SupplierController {
     async add_products(req, res) {
         try {
             const result = await add_products(req);
+            res.json(result);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async get_products(req, res) {
+        try {
+            const result = await get_products(req);
             res.json(result);
         } catch (error) {
             res.status(500).json({ error: error.message });

@@ -30,12 +30,12 @@ ProductVariant.belongsTo(Product, {
 });
 
 // Variant → Images
-ProductVariant.hasMany(ProductImage, {
-    foreignKey: "variant_id",
+Product.hasMany(ProductImage, {
+    foreignKey: "product_id",
     as: "images",
 });
-ProductImage.belongsTo(ProductVariant, {
-    foreignKey: "variant_id",
+ProductImage.belongsTo(Product, {
+    foreignKey: "product_id",
 });
 
 // Supplier → Warehouse

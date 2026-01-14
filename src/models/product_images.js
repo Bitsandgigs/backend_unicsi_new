@@ -2,7 +2,7 @@
 
 import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
-import { ProductVariant } from "./product_variants.js";
+import { Product } from "./product.js";
 
 export const ProductImage = sequelize.define("product_images", {
   id: {
@@ -11,12 +11,12 @@ export const ProductImage = sequelize.define("product_images", {
     primaryKey: true,
   },
 
-  variant_id: {
+  product_id: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
-      model: ProductVariant,
-      key: "variant_id",
+      model: Product,
+      key: "product_id",
     },
   },
 

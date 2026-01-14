@@ -34,6 +34,7 @@ router.get("/getAllSupplier", auth, supplierController.getAllSupplier);
 
 //products
 router.post("/stores/products", auth, upload.array("images", 10), supplierController.add_products);
+router.get("/stores/products", auth, supplierController.get_products);
 router.post("/stores/products/:product_id/variants", auth, upload.array("images", 10), supplierController.add_product_variants);
 router.post("/stores/variants/:variant_id/images", upload.array("images", 10), auth, supplierController.add_product_images);
 
@@ -42,11 +43,13 @@ router.post("/stores/warehouses", auth, supplierController.create_warehouse);
 router.put("/stores/warehouses/:warehouse_id", auth, supplierController.update_warehouse);
 router.get("/stores/warehouses/:warehouse_id", supplierController.get_warehouse);
 router.delete("/stores/warehouses/:warehouse_id", supplierController.delete_warehouse);
-router.post("/stores/inventory", supplierController.create_inventory);
-router.get("/stores/inventory/sku/:sku", supplierController.get_inventory);
-router.get("/stores/inventory", supplierController.get_inventory_by_filter); //in-stock, out-of-stock, all,
-router.put("/stores/inventory/:inventory_id/stock", supplierController.update_inventory_stock);
-router.delete("/stores/inventory/:inventory_id", supplierController.delete_inventory);
+
+// inventory
+router.post("/stores/inventory", auth, supplierController.create_inventory);
+router.get("/stores/inventory/sku/:sku", auth, supplierController.get_inventory);
+router.get("/stores/inventory", auth, supplierController.get_inventory_by_filter); //in-stock, out-of-stock, all,
+router.put("/stores/inventory/:inventory_id/stock", auth, supplierController.update_inventory_stock);
+router.delete("/stores/inventory/:inventory_id", auth, supplierController.delete_inventory);
 
 // router.post("/stores/uploadProducts", supplierController.supplier_products);
 

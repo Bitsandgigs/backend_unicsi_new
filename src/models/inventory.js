@@ -15,9 +15,19 @@ export const Inventory = sequelize.define("inventory", {
     allowNull: false,
   },
 
+  product_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+  },
+
+  variant_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+  },
+
   warehouse_id: {
     type: DataTypes.UUID,
-    allowNull: false,
+    allowNull: true,
   },
 
   available_stock: {
