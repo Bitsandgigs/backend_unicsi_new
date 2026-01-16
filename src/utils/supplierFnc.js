@@ -523,7 +523,58 @@ export const get_products = async (req) => {
     }
 };
 
+export const get_single_product = async (req) => {
+    try {
 
+        const supplier_id = req.user.supplierId;
+        const role = req.user.role;
+        const product_id = req.params.product_id;
+
+        if (!product_id) {
+            return { success: false, error: "Product ID is required!" };
+        }
+
+        if (!supplier_id) {
+            return { success: false, error: "Supplier ID is required!" };
+        }
+
+        if (role !== "SUPPLIER") {
+            return { success: false, error: "Unauthorized!" };
+        }
+
+        const product = await Product.findOne({
+            where: { product_id, supplier_id },
+            include: [
+                {
+                    model: ProductVariant,
+                    as: "variants",
+                },
+                {
+                    model: ProductImage,
+                    as: "images",
+                }
+            ],
+            attributes: {
+                include: [
+                    [
+                        sequelize.literal(
+                            `(SELECT COUNT(*) FROM product_images WHERE product_images.product_id = products.product_id)`
+                        ),
+                        "imageCount",
+                    ],
+                ],
+            },
+        });
+        if (product) {
+            return { success: true, data: product };
+        } else {
+            return { success: false, error: "Product not found!" };
+        }
+    } catch (error) {
+        console.error("[v0] Get single product error:", error);
+        return { success: false, error: error.message || "Failed to get single product" };
+    }
+};
 
 
 export const add_product_variants = async (req) => {
