@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import upload from "../middlewares/uploadMiddleware.js";
 import sequelize from "../config/database.js";
+const t = await sequelize.transaction();
 
 
 export const signup_send_otp = async (req) => {
@@ -520,6 +521,49 @@ export const get_products = async (req) => {
     } catch (error) {
         console.error("[v0] Get products error:", error);
         return { success: false, error: error.message || "Failed to get products" };
+    }
+};
+
+export const update_product = async (req) => {
+    try {
+        
+        const product_id = req.params.product_id;
+        const supplier_id = req.user.supplierId;
+        const role = req.user.role;
+
+        if (!supplier_id) {
+            return { success: false, error: "Supplier ID is required!" };
+        }
+
+        if (role !== "SUPPLIER") {
+            return { success: false, error: "Unauthorized!" };
+        }
+
+        if (!product_id) {
+            return { success: false, error: "Product ID is required!" };
+        }
+
+        const { title, description, brand, variants = [], images = [] } =
+                req.body;
+
+        const product = await Product.findByPk(product_id);
+
+        if (!product) {
+            return { success: false, error: "Product not found!" };
+        }
+
+        await product.update({ title, description, brand });
+
+        for (const variant of variants) {
+            await ProductVariant.update(variant, { where: { variant_id: variant.variant_id,  } });
+        }
+
+        await t.commit();
+        return { success: true, data: product };
+    } catch (error) {
+        console.error("[v0] Update product error:", error);
+        await t.rollback();
+        return { success: false, error: error.message || "Failed to update product" };
     }
 };
 

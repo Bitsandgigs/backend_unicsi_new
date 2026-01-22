@@ -36,12 +36,13 @@ router.get("/getAllSupplier", auth, supplierController.getAllSupplier);
 router.post("/stores/products", auth, upload.array("images", 10), supplierController.add_products);
 router.get("/stores/products", auth, supplierController.get_products);
 router.get("/stores/products/:product_id", auth, supplierController.get_single_product);
-router.put("/stores/products/:product_id", auth, supplierController.update_product);
+router.put("/stores/products/:product_id", auth, upload.array("images", 10), supplierController.update_product);
+
 router.delete("/stores/products/:product_id", auth, supplierController.delete_product);
 router.post("/stores/products/:product_id/variants", auth, upload.array("images", 10), supplierController.add_product_variants);
 router.post("/stores/variants/:variant_id/images", upload.array("images", 10), auth, supplierController.add_product_images);
 
-
+//warehouse
 router.post("/stores/warehouses", auth, supplierController.create_warehouse);
 router.put("/stores/warehouses/:warehouse_id", auth, supplierController.update_warehouse);
 router.get("/stores/warehouses/:warehouse_id", supplierController.get_warehouse);

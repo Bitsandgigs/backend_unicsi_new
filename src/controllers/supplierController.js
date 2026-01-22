@@ -1,4 +1,4 @@
-import { signup, login, profile, signup_send_otp, add_bank_details, add_gst_details, getAllSupplier, add_products, add_product_variants, add_product_images, create_warehouse, update_warehouse, get_warehouse, delete_warehouse, create_inventory, update_inventory_stock, get_inventory, delete_inventory, get_inventory_by_filter, logout, updatePersonalDetails, get_bank_account_details, update_bank_details, get_gst_details, get_products, get_single_product } from "../utils/supplierFnc.js";
+import { signup, login, profile, signup_send_otp, add_bank_details, add_gst_details, getAllSupplier, add_products, add_product_variants, add_product_images, create_warehouse, update_warehouse, get_warehouse, delete_warehouse, create_inventory, update_inventory_stock, get_inventory, delete_inventory, get_inventory_by_filter, logout, updatePersonalDetails, get_bank_account_details, update_bank_details, get_gst_details, get_products, get_single_product, update_product } from "../utils/supplierFnc.js";
 
 
 class SupplierController {
