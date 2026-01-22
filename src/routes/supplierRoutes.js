@@ -52,8 +52,8 @@ router.delete("/stores/warehouses/:warehouse_id", supplierController.delete_ware
 router.post("/stores/inventory", auth, supplierController.create_inventory);
 router.get("/stores/inventory/sku/:sku", auth, supplierController.get_inventory);
 router.get("/stores/inventory", auth, supplierController.get_inventory_by_filter); //in-stock, out-of-stock, all,
-router.put("/stores/inventory/:inventory_id/stock", auth, supplierController.update_inventory_stock);
-router.delete("/stores/inventory/:inventory_id", auth, supplierController.delete_inventory);
+router.put("/stores/inventory/:sku", auth, supplierController.update_inventory_stock);
+router.delete("/stores/inventory/:sku", auth, supplierController.delete_inventory);
 
 // router.post("/stores/uploadProducts", supplierController.supplier_products);
 

@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import upload from "../middlewares/uploadMiddleware.js";
 import sequelize from "../config/database.js";
-const t = await sequelize.transaction();
+
 
 
 export const signup_send_otp = async (req) => {
@@ -525,6 +525,7 @@ export const get_products = async (req) => {
 };
 
 export const update_product = async (req) => {
+    const t = await sequelize.transaction();
     try {
         
         const product_id = req.params.product_id;
@@ -774,32 +775,64 @@ export const create_inventory = async (req) => {
 
 
 export const update_inventory_stock = async (req) => {
-    try {
-        const { inventory_id } = req.params;
-        const { quantity, action } = req.body;
-        const inventory = await Inventory.findOne({ where: { inventory_id } });
-        if (!inventory) {
-            return { success: false, msg: "Inventory not found!" };
-        }
-        if (action === "add") {
-            inventory.available_stock += quantity;
-        } else if (action === "deduct") {
-            //(>=0 check)
-            if (inventory.available_stock < quantity) {
-                return { success: false, msg: "Not enough stock!" };
-            }
-            inventory.available_stock -= quantity;
-        }
-        const data = await Inventory.update({ available_stock: inventory.available_stock }, { where: { inventory_id } });
-        if (data) {
-            return { success: true, data: data };
-        } else {
-            return { success: false, msg: "Inventory not updated!" };
-        }
-    } catch (error) {
-        return { success: false, error: error.message };
+ const t = await sequelize.transaction();
+ console.log("transaction",req.body);
+  try {
+    const { sku } = req.params;
+    const { quantity, action } = req.body;
+    const { supplierId, role } = req.user;
+
+    if (!sku) throw new Error("SKU is required");
+    if (!supplierId) throw new Error("supplier_id is required");
+    if (role !== "SUPPLIER") throw new Error("Unauthorized!");
+    if (!quantity || quantity <= 0) throw new Error("Quantity must be > 0");
+    if (!["add", "deduct"].includes(action))
+      throw new Error("Invalid action");
+
+    const inventory = await Inventory.findOne({
+      where: { sku },
+      transaction: t,
+      lock: t.LOCK.UPDATE, // 🔒 prevents race conditions
+    });
+
+    if (!inventory) throw new Error("Inventory not found");
+
+    const variant = await ProductVariant.findOne({
+      where: { sku: inventory.sku },
+      transaction: t,
+      lock: t.LOCK.UPDATE,
+    });
+
+    if (!variant) throw new Error("Variant not found");
+
+    if (action === "deduct" && inventory.available_stock < quantity) {
+      throw new Error("Not enough stock!");
     }
-}
+
+    if (action === "add") {
+      inventory.available_stock += quantity;
+      variant.variant_stock += quantity;
+    } else {
+      inventory.available_stock -= quantity;
+      variant.variant_stock -= quantity;
+    }
+
+    await inventory.save({ transaction: t });
+    await variant.save({ transaction: t });
+
+    await t.commit();
+
+    return { success: true, msg: "Inventory updated successfully!" };
+
+  } catch (error) {
+    if (!t.finished) {
+      await t.rollback();
+    }
+
+    return { success: false, error: error.message };
+  }
+};
+
 
 export const get_inventory = async (req) => {
     try {
@@ -817,9 +850,9 @@ export const get_inventory = async (req) => {
 
 export const delete_inventory = async (req) => {
     try {
-        const { inventory_id } = req.params;
+        const { sku } = req.params;
         // soft delete
-        const data = await Inventory.update({ is_active: false }, { where: { inventory_id } });
+        const data = await Inventory.update({ is_active: false }, { where: { sku } });
         if (data) {
             return { success: true, data: data };
         } else {
