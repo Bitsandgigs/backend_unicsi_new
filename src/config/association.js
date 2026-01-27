@@ -1,4 +1,4 @@
-import { Supplier, Product, ProductVariant, ProductImage, Warehouse, Inventory, SupplierPricing, Reseller, Order, OrderItem, NdrCase } from "../models/index.js";
+import { Supplier, Product, ProductVariant, ProductImage, Warehouse, Inventory, SupplierPricing, Reseller, Order, OrderItem, NdrCase, supplier_gst_details } from "../models/index.js";
 import { User } from "../models/User.js";
 
 /* ===========================
@@ -70,6 +70,11 @@ OrderItem.belongsTo(Order);
 
 OrderItem.hasOne(NdrCase, { foreignKey: "order_item_id" });
 NdrCase.belongsTo(OrderItem);
+
+Supplier.hasOne(supplier_gst_details, { foreignKey: "supplier_id",
+    as: "gst_details",
+ });
+supplier_gst_details.belongsTo(Supplier);
 
 // User.hasOne(Supplier, { foreignKey: "user_id" });
 // Supplier.belongsTo(User, { foreignKey: "user_id" });

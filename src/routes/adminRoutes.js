@@ -8,4 +8,10 @@ router.post("/products/:product_id/approve", SuperAdminController.approveProduct
 router.post("/products/:product_id/reject", SuperAdminController.rejectProduct);
 router.put("/products/:product_id/modified/:variant_id", SuperAdminController.modifiedProducts);
 
+
+// get all supplier
+router.get("/get-all-suppliers", SuperAdminController.getAllSupplier);
+// supplier kyc verification
+router.get("/get-all-kyc-verifications", SuperAdminController.supplierKycVerification);
+
 export default router;

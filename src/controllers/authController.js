@@ -116,38 +116,26 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check for user in DB
     const user = await User.findOne({ where: { email } });
     if (!user)
       return res.status(400).json({ message: "Invalid email or password" });
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(400).json({ message: "Invalid email or password" });
 
-    // Generate JWT Token
-    // const token = jwt.sign(
-    //   { id: user.user_id, role: user.role },
-    //   process.env.JWT_ACCESS_SECRET,
-    //   { expiresIn: "1d" }
-    // );
-
-    console.log(user);
-     let supplier = null;
-    if(user.role === "SUPPLIER"){
+    let supplier = null;
+    let payload = { role: user.role };
+    
+    if (user.role === "SUPPLIER") {
       supplier = await Supplier.findOne({ where: { email } });
+      payload.supplierId = supplier.supplier_id;
     }
   
-    console.log("supplier123=> " ,supplier);
-    // payload
-    const payload = {
-      supplierId: supplier.supplier_id,
-      role : user.role,
-    };
+    if (user.role === "ADMIN") {
+      payload.userId = user.user_id;
+    }
 
-
-    // 🔑 Tokens
     const accessToken = jwt.sign(
       payload,
       process.env.JWT_ACCESS_SECRET,
@@ -160,29 +148,38 @@ export const login = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    // 🍪 Cookies
+    // 🍪 Set access_token cookie
     res.cookie("access_token", accessToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax", // Changed from "strict" for cross-origin
       maxAge: 1 * 60 * 60 * 1000
     });
 
+    // 🍪 Set refresh_token cookie
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    // ⭐ ADD THIS: Set user_role cookie
+    res.cookie("user_role", user.role.toLowerCase(), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 1 * 60 * 60 * 1000
     });
 
     return res.status(200).json({
       success: true,
       message: "Login successful",
-      token : accessToken,
-      refreshToken : refreshToken,
+      token: accessToken,
+      refreshToken: refreshToken,
       data: {
         id: user.user_id,
-        supplier_id: supplier.supplier_id,
+        supplier_id: user.role === "SUPPLIER" ? supplier.supplier_id : null,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -205,4 +202,6 @@ export const logout = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+
 

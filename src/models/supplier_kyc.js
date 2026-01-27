@@ -30,6 +30,21 @@ export const SupplierKyc = sequelize.define("supplier_kyc", {
         defaultValue: false,
     },
 
+    adhaare_verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
+
+    pan_verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
+
+    bank_verified: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
+
     kyc_status: {
         type: DataTypes.ENUM("pending", "approved", "rejected"),
         defaultValue: "pending",

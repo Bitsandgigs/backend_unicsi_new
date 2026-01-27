@@ -31,6 +31,7 @@ const app = express();
 app.use(
   cors({
     origin: [
+      "http://localhost:3000",
       "http://localhost:5173", //your React dev server
       "https://capable-mooncake-8f037f.netlify.app", //your React dev server
       "https://unicse.pages.dev", // your deployed site

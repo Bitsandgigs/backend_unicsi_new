@@ -1,4 +1,4 @@
-import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory, ProductReviewLog } from "../models/index.js";
+import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory, ProductReviewLog, supplier_gst_details } from "../models/index.js";
 
 export const getPendingProducts = async (req, res) => {
     try {
@@ -141,5 +141,31 @@ export const modifiedProducts = async (req) => {
         return { success: true, data: variant };
     } catch (error) {
         return { success: false, error: error.message };
+    }
+}
+
+
+export const getAllSupplier = async (req) => {
+    try {
+        const suppliers = await Supplier.findAll();
+        return { success: true, message: "Suppliers fetched successfully", count: suppliers.length, data: suppliers };
+    } catch (error) {
+        return { success: false, message: error.message };
+    }
+}
+
+export const supplierKycVerification = async (req) => {
+    try {
+        const suppliers = await Supplier.findAll({
+           include: [
+            {
+                model: supplier_gst_details,
+                as: "gst_details",
+            }
+           ]
+        });
+        return { success: true, message: "Suppliers fetched successfully", count: suppliers.length, data: suppliers };
+    } catch (error) {
+        return { success: false, message: error.message };
     }
 }
