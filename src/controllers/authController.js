@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { sendOTP, verifyOTP } from "../services/otpService.js";
 import { User } from "../models/User.js";
 import { Supplier } from "../models/index.js";
+import { SupplierKyc } from "../models/index.js";
 
 /**
  * Step 1: Send OTP to a user's email for verification
@@ -85,11 +86,15 @@ export const signup = async (req, res) => {
     });
 
     if (role === "SUPPLIER") {
-      await Supplier.create({
+      const supplier = await Supplier.create({
         name: name,
         email: email,
         password: hashedPassword,
         account_status: "pending",
+      });
+
+      await SupplierKyc.create({
+        supplier_id: supplier.supplier_id,
       });
     }
 

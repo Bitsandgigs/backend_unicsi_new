@@ -14,7 +14,6 @@ import { Reseller } from "./resellers.js";
 import { NdrCase } from "./ndr_cases.js";
 import { LedgerEntry } from "./ledger_entries.js";
 import { Order } from "./Order.js";
-import { OrderItem } from "./order_items.js";
 import { OrderStatusHistory } from "./order_status_history.js";
 import { supplier_bank_details } from "./supplier_bank_details.js";
 import { supplier_gst_details } from "./supplier_gst_details.js";
@@ -36,7 +35,6 @@ export {
     NdrCase,
     LedgerEntry,
     Order,
-    OrderItem,
     OrderStatusHistory,
     supplier_bank_details,
     supplier_gst_details

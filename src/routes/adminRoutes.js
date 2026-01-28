@@ -11,7 +11,14 @@ router.put("/products/:product_id/modified/:variant_id", SuperAdminController.mo
 
 // get all supplier
 router.get("/get-all-suppliers", SuperAdminController.getAllSupplier);
+
 // supplier kyc verification
 router.get("/get-all-kyc-verifications", SuperAdminController.supplierKycVerification);
+
+// supplier verify
+router.patch("/supplier-verify", SuperAdminController.verifySupplier);
+
+// supplier reject
+router.post("/supplier-reject", SuperAdminController.rejectSupplierProof);
 
 export default router;

@@ -27,3 +27,4 @@ export const OrderStatusHistory = sequelize.define("order_status_history", {
         defaultValue: DataTypes.NOW,
     },
 });
+

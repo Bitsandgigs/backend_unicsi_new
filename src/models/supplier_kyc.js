@@ -15,38 +15,13 @@ export const SupplierKyc = sequelize.define("supplier_kyc", {
         allowNull: false,
     },
 
-    gst_number: {
+    reason: {
         type: DataTypes.STRING,
         allowNull: true,
-    },
-
-    msme_number: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-
-    gst_verified: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    },
-
-    adhaare_verified: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    },
-
-    pan_verified: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    },
-
-    bank_verified: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
     },
 
     kyc_status: {
-        type: DataTypes.ENUM("pending", "approved", "rejected"),
+        type: DataTypes.ENUM("pending", "verified", "rejected"),
         defaultValue: "pending",
     },
 }, {

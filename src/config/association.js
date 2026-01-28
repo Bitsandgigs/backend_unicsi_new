@@ -1,4 +1,4 @@
-import { Supplier, Product, ProductVariant, ProductImage, Warehouse, Inventory, SupplierPricing, Reseller, Order, OrderItem, NdrCase, supplier_gst_details } from "../models/index.js";
+import { Supplier, Product, ProductVariant, ProductImage, Warehouse, Inventory, SupplierPricing, Reseller, Order, NdrCase, supplier_gst_details } from "../models/index.js";
 import { User } from "../models/User.js";
 
 /* ===========================
@@ -64,12 +64,6 @@ SupplierPricing.belongsTo(ProductVariant, {
 Reseller.hasMany(Order, { foreignKey: "reseller_id" });
 Order.belongsTo(Reseller);
 
-
-Order.hasMany(OrderItem, { foreignKey: "order_id" });
-OrderItem.belongsTo(Order);
-
-OrderItem.hasOne(NdrCase, { foreignKey: "order_item_id" });
-NdrCase.belongsTo(OrderItem);
 
 Supplier.hasOne(supplier_gst_details, { foreignKey: "supplier_id",
     as: "gst_details",

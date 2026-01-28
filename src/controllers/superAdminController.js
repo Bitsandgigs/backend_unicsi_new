@@ -1,4 +1,4 @@
-import { getPendingProducts, getProductById, approveProduct, rejectProduct, modifiedProducts, getAllSupplier, supplierKycVerification } from "../utils/adminFunc.js";
+import { getPendingProducts, getProductById, approveProduct, rejectProduct, modifiedProducts, getAllSupplier, supplierKycVerification, verifySupplier, rejectSupplierProof } from "../utils/adminFunc.js";
 
 
 
@@ -66,6 +66,26 @@ class SuperAdminController {
     supplierKycVerification = async (req, res) => {
         try {
             const result = await supplierKycVerification(req);
+            res.status(200).json(result);
+        } catch (error) {
+            console.error("Error fetching all suppliers:", error);
+            res.status(500).json({ error: "Failed to fetch all suppliers" });
+        }
+    };
+
+    verifySupplier = async (req, res) => {
+        try {
+            const result = await verifySupplier(req);
+            res.status(200).json(result);
+        } catch (error) {
+            console.error("Error fetching all suppliers:", error);
+            res.status(500).json({ error: "Failed to fetch all suppliers" });
+        }
+    };
+
+    rejectSupplierProof = async (req, res) => {
+        try {
+            const result = await rejectSupplierProof(req);
             res.status(200).json(result);
         } catch (error) {
             console.error("Error fetching all suppliers:", error);

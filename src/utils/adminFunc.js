@@ -1,4 +1,4 @@
-import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory, ProductReviewLog, supplier_gst_details } from "../models/index.js";
+import { Supplier, ProductImage, Product, ProductVariant, Warehouse, Inventory, ProductReviewLog, supplier_gst_details, SupplierKyc } from "../models/index.js";
 
 export const getPendingProducts = async (req, res) => {
     try {
@@ -169,3 +169,54 @@ export const supplierKycVerification = async (req) => {
         return { success: false, message: error.message };
     }
 }
+
+export const verifySupplier = async (req) => {
+    try {
+        const { supplier_id, status } = req.body;
+
+        // find supplier by id
+        const supplier = await Supplier.findByPk(supplier_id);
+
+        if (!supplier) {
+            return {
+                success: false,
+                message: "Supplier not found",
+            };
+        }
+
+        supplier.account_status = status;
+        await supplier.save();
+
+        return { success: true, data: supplier };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+export const rejectSupplierProof = async (req) => {
+    try {
+        const { supplier_id, reason } = req.body;
+
+        // find supplier by id
+        const supplier = await Supplier.findByPk(supplier_id);
+
+        if (!supplier) {
+            return {
+                success: false,
+                message: "Supplier not found",
+            };
+        }
+
+        supplier.account_status = "suspended";
+        supplier.reason = reason;
+        await supplier.save();
+
+        // const 
+
+        return { success: true, data: supplier };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+}
+
+
